@@ -1018,7 +1018,7 @@ function connectToSender(){
       listenForFile(conn);
     });
     conn.on('error', () => setRecvStatus('error','<span>Connection failed. Check code.</span>'));
-    setTimeout(()=>{ if(!conn.open) setRecvStatus('error','<span>Could not reach sender. Try again.</span>'); },15000);
+    setTimeout(()=>{ if(!conn.open) setRecvStatus('error','<span>Could not reach sender. Try again.</span>'); },30000);
   });
   receiverPeer.on('error', err => setRecvStatus('error','<span>Error: '+(err.message||err.type)+'</span>'));
 }
@@ -1297,7 +1297,7 @@ function connectForCode(){
     conn.on('open', () => setCodeRecvStatus('info','<div class="md-spinner"></div><span>Connected! Waiting…</span>'));
     conn.on('data', msg => { if(msg.type==='code') receiveCode(msg); });
     conn.on('error', () => setCodeRecvStatus('error','<span>Connection failed.</span>'));
-    setTimeout(()=>{ if(!conn.open) setCodeRecvStatus('error','<span>Could not reach sender. Try again.</span>'); },15000);
+    setTimeout(()=>{ if(!conn.open) setCodeRecvStatus('error','<span>Could not reach sender. Try again.</span>'); },30000);
   });
   codeRecvPeer.on('error', err => setCodeRecvStatus('error','<span>Error: '+(err.message||err.type)+'</span>'));
 }
