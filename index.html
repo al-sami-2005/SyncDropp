@@ -9,7 +9,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+<!-- Upgraded to Modern Material Symbols for better, crisper icons -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
@@ -70,6 +71,11 @@ body::after {
 ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
+.material-symbols-rounded {
+  font-variation-settings: 'FILL' 0, 'wght' 500, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
 .app-logo { width: 32px; height: 32px; object-fit: contain; filter: drop-shadow(0 0 8px var(--primary-glow)); }
 .logo-spinner {
   width: 20px; height: 20px;
@@ -113,9 +119,9 @@ body::after {
   color: var(--text-muted); font-size: 13px; font-weight: 600;
   cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-radius: var(--radius-full);
 }
-.tab .material-icons-round { font-size: 20px; transition: transform 0.3s; }
+.tab .material-symbols-rounded { font-size: 20px; transition: transform 0.3s; }
 .tab.active { color: #fff; background: var(--primary); box-shadow: var(--shadow-glow); text-shadow: 0 2px 4px rgba(0,0,0,0.3); }
-.tab.active .material-icons-round { transform: scale(1.15); color: #000; }
+.tab.active .material-symbols-rounded { transform: scale(1.15); color: #000; font-variation-settings: 'FILL' 1; }
 .tab:not(.active):hover { color: var(--primary); background: rgba(255,255,255,0.05); }
 
 .panel { display: none; opacity: 0; transform: translateY(20px); transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
@@ -132,7 +138,7 @@ body::after {
 .md-card:hover { border-color: rgba(0, 229, 255, 0.3); box-shadow: 0 12px 40px rgba(0, 229, 255, 0.08); }
 .md-card-header { padding: 24px 28px 0; display: flex; align-items: center; gap: 16px; }
 .md-card-header-icon { width: 48px; height: 48px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; display: flex; align-items: center; justify-content: center; box-shadow: inset 0 2px 10px rgba(255,255,255,0.05); }
-.md-card-header-icon .material-icons-round { font-size: 24px; color: var(--primary); }
+.md-card-header-icon .material-symbols-rounded { font-size: 24px; color: var(--primary); font-variation-settings: 'FILL' 1; }
 .md-card-title { font-size: 18px; font-weight: 600; color: #fff; letter-spacing: -0.3px; }
 .md-card-subtitle { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); letter-spacing: 1px; margin-top: 6px; text-transform: uppercase; }
 .md-card-body { padding: 24px 28px 28px; }
@@ -147,7 +153,7 @@ body::after {
 .md-btn::after { content:''; position:absolute; inset:0; background:linear-gradient(rgba(255,255,255,0.2), transparent); opacity:0; transition:opacity 0.2s; }
 .md-btn:hover::after { opacity: 1; }
 .md-btn:active { transform: scale(0.95); }
-.md-btn .material-icons-round { font-size: 20px; }
+.md-btn .material-symbols-rounded { font-size: 20px; font-variation-settings: 'FILL' 1; }
 .md-btn-filled { background: var(--primary); color: #000; box-shadow: 0 6px 20px rgba(0, 229, 255, 0.25); text-shadow: 0 1px 2px rgba(255,255,255,0.5); }
 .md-btn-filled:disabled { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.3); box-shadow: none; pointer-events:none; }
 .md-btn-outlined { background: rgba(0,0,0,0.3); color: var(--primary); border: 1px solid var(--primary); backdrop-filter: blur(10px); }
@@ -159,7 +165,8 @@ body::after {
 .copy-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: var(--radius-sm); background: rgba(0,0,0,0.4); color: var(--text-main); border: 1px solid rgba(255,255,255,0.15); font-family: var(--font-sans); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; backdrop-filter: blur(8px); }
 .copy-btn:hover { background: rgba(0, 229, 255, 0.1); border-color: var(--primary); color: var(--primary); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
 .copy-btn.copied { background: var(--success); color: #000; border-color: var(--success); }
-.copy-btn .material-icons-round { font-size: 18px; }
+.copy-btn .material-symbols-rounded { font-size: 18px; font-variation-settings: 'FILL' 0; }
+.copy-btn.copied .material-symbols-rounded { font-variation-settings: 'FILL' 1; }
 
 .md-text-input {
   flex: 1; width: 100%; background: rgba(0,0,0,0.4); border: 1px solid var(--border);
@@ -182,7 +189,7 @@ body::after {
 .drop-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; width:100%; height:100%; z-index:2; }
 .drop-zone-icon { width: 72px; height: 72px; background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1); box-shadow: var(--shadow-glass); }
 .drop-zone:hover .drop-zone-icon, .drop-zone.dragover .drop-zone-icon { background: var(--primary-light); border-color: var(--primary); transform: scale(1.1) translateY(-8px); box-shadow: 0 10px 25px var(--primary-glow); }
-.drop-zone-icon .material-icons-round { font-size: 36px; color: var(--primary); }
+.drop-zone-icon .material-symbols-rounded { font-size: 36px; color: var(--primary); }
 .drop-zone-title { font-size: 18px; font-weight: 600; color: #fff; margin-bottom: 8px; }
 .drop-zone-sub { font-size: 14px; color: var(--text-muted); }
 
@@ -192,7 +199,7 @@ body::after {
 .file-size { font-size: 13px; font-family: var(--font-mono); color: var(--primary); margin-top: 6px; }
 .file-remove { background:rgba(255,77,77,0.1); border:1px solid rgba(255,77,77,0.3); cursor:pointer; width: 40px; height: 40px; border-radius:50%; color:var(--error); transition:all 0.3s; display:flex; align-items:center; justify-content:center; }
 .file-remove:hover { background:var(--error); color:#fff; transform: scale(1.1) rotate(90deg); box-shadow: 0 0 15px rgba(255,77,77,0.4); }
-.file-remove .material-icons-round { font-size: 20px; }
+.file-remove .material-symbols-rounded { font-size: 20px; }
 
 .code-hero { background: rgba(0, 0, 0, 0.4); border: 1px solid var(--border); border-radius: var(--radius-md); padding: 32px; text-align: center; position: relative; overflow: hidden; box-shadow: inset 0 0 40px rgba(0, 229, 255, 0.05); }
 .code-hero::before { content:''; position:absolute; top:0; left:0; width:100%; height:4px; background: var(--primary); box-shadow: var(--shadow-glow); }
@@ -293,7 +300,7 @@ body::after {
 
 .coffee-btn { display: flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--warning); padding: 8px 16px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: var(--font-sans); }
 .coffee-btn:hover { background: var(--warning); color: #000; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
-.coffee-btn .material-icons-round { font-size: 18px; }
+.coffee-btn .material-symbols-rounded { font-size: 18px; }
 
 .about-scroll { max-height: 75vh; overflow-y: auto; padding-right: 8px; }
 .about-scroll::-webkit-scrollbar, .preview-list::-webkit-scrollbar, #recv-files-list::-webkit-scrollbar { width: 4px; }
@@ -321,7 +328,7 @@ body::after {
   gap: 8px;
   margin-top: 12px;
 }
-.ice-info-banner .material-icons-round { font-size: 16px; color: var(--warning); flex-shrink: 0; }
+.ice-info-banner .material-symbols-rounded { font-size: 16px; color: var(--warning); flex-shrink: 0; }
 
 .hidden { display: none !important; }
 
@@ -350,7 +357,7 @@ body::after {
   <div class="header-actions">
     <div class="app-bar-chip">SECURE P2P</div>
     <button class="coffee-btn" onclick="openAbout()" title="Support & About">
-      <span class="material-icons-round">local_cafe</span>
+      <span class="material-symbols-rounded">local_cafe</span>
       <span class="coffee-text">Buy me a Coffee</span>
     </button>
   </div>
@@ -359,16 +366,16 @@ body::after {
 <main class="container">
   <nav class="tab-bar">
     <button class="tab active" onclick="switchTab('send')">
-      <span class="material-icons-round">upload_file</span> Send File
+      <span class="material-symbols-rounded">upload_file</span> Send File
     </button>
     <button class="tab" onclick="switchTab('receive')">
-      <span class="material-icons-round">download</span> Get File
+      <span class="material-symbols-rounded">download</span> Get File
     </button>
     <button class="tab" onclick="switchTab('code-send')">
-      <span class="material-icons-round">data_object</span> Share Code
+      <span class="material-symbols-rounded">data_object</span> Share Code
     </button>
     <button class="tab" onclick="switchTab('code-recv')">
-      <span class="material-icons-round">terminal</span> Get Code
+      <span class="material-symbols-rounded">terminal</span> Get Code
     </button>
   </nav>
 
@@ -376,7 +383,7 @@ body::after {
   <section class="panel active" id="panel-send">
     <div class="md-card">
       <div class="md-card-header">
-        <div class="md-card-header-icon"><span class="material-icons-round">attach_file</span></div>
+        <div class="md-card-header-icon"><span class="material-symbols-rounded">attach_file</span></div>
         <div>
           <h2 class="md-card-title">Select File to Sync</h2>
           <div class="md-card-subtitle">MAX 500 MB · BROWSER-TO-BROWSER</div>
@@ -385,7 +392,7 @@ body::after {
       <div class="md-card-body">
         <div class="drop-zone" id="drop-zone">
           <input type="file" id="file-input" multiple onchange="handleFileSelect(this.files)">
-          <div class="drop-zone-icon"><span class="material-icons-round">cloud_upload</span></div>
+          <div class="drop-zone-icon"><span class="material-symbols-rounded">cloud_upload</span></div>
           <div class="drop-zone-title">Drag & Drop files here</div>
           <div class="drop-zone-sub">or click to browse your device</div>
         </div>
@@ -402,7 +409,7 @@ body::after {
 
     <div class="md-card hidden" id="send-action-card">
       <div class="md-card-header">
-        <div class="md-card-header-icon"><span class="material-icons-round">sensors</span></div>
+        <div class="md-card-header-icon"><span class="material-symbols-rounded">sensors</span></div>
         <div>
           <h2 class="md-card-title">Connection Details</h2>
           <div class="md-card-subtitle">READY TO SYNC</div>
@@ -410,7 +417,7 @@ body::after {
       </div>
       <div class="md-card-body">
         <button class="md-btn md-btn-filled md-btn-full" id="send-start-btn" onclick="startSend()">
-          <span class="material-icons-round">rocket_launch</span> GENERATE SYNC LINK
+          <span class="material-symbols-rounded">rocket_launch</span> GENERATE SYNC LINK
         </button>
 
         <div id="share-active-area" class="hidden">
@@ -418,13 +425,13 @@ body::after {
             <div class="code-digits" id="my-code">——</div>
             <div class="code-actions">
               <button class="copy-btn" id="copy-code-btn" onclick="copyValue('my-code', 'copy-code-btn')">
-                <span class="material-icons-round">content_copy</span> COPY CODE
+                <span class="material-symbols-rounded">content_copy</span> COPY CODE
               </button>
               <button class="copy-btn" id="copy-link-btn" onclick="copyShareLink('copy-link-btn')">
-                <span class="material-icons-round">link</span> COPY LINK
+                <span class="material-symbols-rounded">link</span> COPY LINK
               </button>
               <button class="copy-btn" onclick="toggleQR()">
-                <span class="material-icons-round">qr_code_2</span> QR
+                <span class="material-symbols-rounded">qr_code_2</span> QR
               </button>
             </div>
           </div>
@@ -439,7 +446,7 @@ body::after {
           </div>
 
           <div class="ice-info-banner hidden" id="send-ice-banner">
-            <span class="material-icons-round">info</span>
+            <span class="material-symbols-rounded">info</span>
             <span id="send-ice-text">Establishing connection route…</span>
           </div>
 
@@ -462,7 +469,7 @@ body::after {
               <div class="stat-cell"><div class="stat-val" id="send-eta">—</div><div class="stat-key">ETA</div></div>
             </div>
             <button class="md-btn md-btn-danger" style="margin-top: 28px; padding: 0 40px;" onclick="cancelTransfer()" id="send-cancel-btn">
-              <span class="material-icons-round">cancel</span> CANCEL SYNC
+              <span class="material-symbols-rounded">cancel</span> CANCEL SYNC
             </button>
             <div class="success-burst" id="send-success">
               <div class="burst-icon"><img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="app-logo" alt="Done"></div>
@@ -479,7 +486,7 @@ body::after {
   <section class="panel" id="panel-receive">
     <div class="md-card">
       <div class="md-card-header">
-        <div class="md-card-header-icon"><span class="material-icons-round">vpn_key</span></div>
+        <div class="md-card-header-icon"><span class="material-symbols-rounded">vpn_key</span></div>
         <div>
           <h2 class="md-card-title">Enter Sync Code</h2>
           <div class="md-card-subtitle">CONNECT TO SENDER</div>
@@ -489,16 +496,16 @@ body::after {
         <div class="recv-row">
           <input class="md-text-input" type="text" id="receive-code" placeholder="6-DIGIT CODE" maxlength="6" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')connectToSender()">
           <button class="md-btn md-btn-filled" onclick="connectToSender()">
-            <span class="material-icons-round">bolt</span> CONNECT
+            <span class="material-symbols-rounded">bolt</span> CONNECT
           </button>
         </div>
         <div class="or-divider">OR</div>
         <button class="md-btn md-btn-outlined md-btn-full" onclick="openQRScanner()">
-          <span class="material-icons-round">qr_code_scanner</span> SCAN QR CODE
+          <span class="material-symbols-rounded">qr_code_scanner</span> SCAN QR CODE
         </button>
         <div id="receive-status" class="hidden"></div>
         <div class="ice-info-banner hidden" id="recv-ice-banner">
-          <span class="material-icons-round">info</span>
+          <span class="material-symbols-rounded">info</span>
           <span id="recv-ice-text">Negotiating connection path…</span>
         </div>
       </div>
@@ -525,7 +532,7 @@ body::after {
             <div class="stat-cell"><div class="stat-val" id="recv-eta">—</div><div class="stat-key">ETA</div></div>
           </div>
           <button class="md-btn md-btn-danger" style="margin-top: 28px; padding: 0 40px;" onclick="cancelTransfer()" id="recv-cancel-btn">
-            <span class="material-icons-round">cancel</span> CANCEL SYNC
+            <span class="material-symbols-rounded">cancel</span> CANCEL SYNC
           </button>
           <div class="success-burst" id="recv-success">
             <div class="burst-icon"><img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="app-logo" alt="Done"></div>
@@ -533,7 +540,7 @@ body::after {
             <div class="burst-meta" id="recv-done-meta" style="margin-bottom: 20px;"></div>
             <div id="recv-files-list" class="hidden" style="width: 100%; display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; max-height: 250px; overflow-y: auto; padding-right: 4px;"></div>
             <button class="md-btn md-btn-filled" style="margin-top:24px" onclick="downloadFile()" id="recv-single-save-btn">
-              <span class="material-icons-round">save_alt</span> SAVE TO DEVICE
+              <span class="material-symbols-rounded">save_alt</span> SAVE TO DEVICE
             </button>
           </div>
         </div>
@@ -549,7 +556,7 @@ body::after {
           <div class="window-dots"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div></div>
           <span style="font-family: var(--font-sans); font-size: 14px; color: var(--primary); font-weight: 600; letter-spacing: 0.5px;" id="editor-lang-label">AUTO-DETECT: PLAIN TEXT</span>
         </div>
-        <button class="copy-btn" onclick="clearCodeEditor()" style="padding: 6px 14px; background: transparent; border-color: transparent;"><span class="material-icons-round" style="font-size:16px">delete_outline</span> CLEAR</button>
+        <button class="copy-btn" onclick="clearCodeEditor()" style="padding: 6px 14px; background: transparent; border-color: transparent;"><span class="material-symbols-rounded" style="font-size:16px">delete_outline</span> CLEAR</button>
       </div>
       <div class="code-pane">
         <div class="line-nums" id="line-nums">1</div>
@@ -560,17 +567,17 @@ body::after {
     <div class="md-card" style="margin-top: 24px;">
       <div class="md-card-body">
         <button class="md-btn md-btn-filled md-btn-full" id="code-share-start-btn" onclick="startCodeShare()">
-          <span class="material-icons-round">share</span> GENERATE SYNC LINK
+          <span class="material-symbols-rounded">share</span> GENERATE SYNC LINK
         </button>
         <div id="code-share-ready" class="hidden" style="margin-top: 28px;">
           <div class="code-hero">
             <div class="code-digits" id="my-code-share">——</div>
             <div class="code-actions">
               <button class="copy-btn" id="copy-codeshare-btn" onclick="copyValue('my-code-share', 'copy-codeshare-btn')">
-                <span class="material-icons-round">content_copy</span> COPY CODE
+                <span class="material-symbols-rounded">content_copy</span> COPY CODE
               </button>
               <button class="copy-btn" id="copy-codelink-btn" onclick="copyShareLink('copy-codelink-btn', true)">
-                <span class="material-icons-round">link</span> COPY LINK
+                <span class="material-symbols-rounded">link</span> COPY LINK
               </button>
             </div>
           </div>
@@ -590,7 +597,7 @@ body::after {
   <section class="panel" id="panel-code-recv">
     <div class="md-card">
       <div class="md-card-header">
-        <div class="md-card-header-icon"><span class="material-icons-round">vpn_key</span></div>
+        <div class="md-card-header-icon"><span class="material-symbols-rounded">vpn_key</span></div>
         <div>
           <h2 class="md-card-title">Enter Snippet Code</h2>
           <div class="md-card-subtitle">PULL CODE FROM SENDER</div>
@@ -600,7 +607,7 @@ body::after {
         <div class="recv-row">
           <input class="md-text-input" type="text" id="code-recv-input" placeholder="6-DIGIT CODE" maxlength="6" oninput="this.value=this.value.toUpperCase()" onkeydown="if(event.key==='Enter')connectForCode()">
           <button class="md-btn md-btn-filled" onclick="connectForCode()">
-            <span class="material-icons-round">download</span> GET
+            <span class="material-symbols-rounded">download</span> GET
           </button>
         </div>
         <div id="code-recv-status" class="hidden"></div>
@@ -613,8 +620,8 @@ body::after {
           <span style="font-family: var(--font-sans); font-size: 14px; color: var(--primary); font-weight: 600; letter-spacing: 0.5px;" id="recv-code-lang-label">Language</span>
         </div>
         <div style="display:flex; gap: 12px;">
-          <button class="copy-btn" id="copy-recv-code-btn" onclick="copyReceivedCode()"><span class="material-icons-round" style="font-size:16px">content_copy</span> COPY</button>
-          <button class="copy-btn" style="color: var(--success); border-color: rgba(16, 185, 129, 0.4);" onclick="downloadCodeFile()"><span class="material-icons-round" style="font-size:16px">save_alt</span> SAVE</button>
+          <button class="copy-btn" id="copy-recv-code-btn" onclick="copyReceivedCode()"><span class="material-symbols-rounded" style="font-size:16px">content_copy</span> COPY</button>
+          <button class="copy-btn" style="color: var(--success); border-color: rgba(16, 185, 129, 0.4);" onclick="downloadCodeFile()"><span class="material-symbols-rounded" style="font-size:16px">save_alt</span> SAVE</button>
         </div>
       </div>
       <div class="code-pane" style="background: rgba(0,0,0,0.3);">
@@ -629,8 +636,8 @@ body::after {
 <div class="modal-backdrop" id="qr-scanner-backdrop" onclick="if(event.target===this) closeQRScanner()">
   <div class="modal-surface">
     <div class="modal-header">
-      <div class="modal-title"><span class="material-icons-round">qr_code_scanner</span> Scan QR Code</div>
-      <button class="modal-close" onclick="closeQRScanner()"><span class="material-icons-round">close</span></button>
+      <div class="modal-title"><span class="material-symbols-rounded">qr_code_scanner</span> Scan QR Code</div>
+      <button class="modal-close" onclick="closeQRScanner()"><span class="material-symbols-rounded">close</span></button>
     </div>
     <div class="modal-body">
       <div style="position: relative;">
@@ -650,8 +657,8 @@ body::after {
 <div class="modal-backdrop" id="about-modal" onclick="if(event.target===this) closeAbout()">
   <div class="modal-surface">
     <div class="modal-header">
-      <div class="modal-title"><span class="material-icons-round">info</span> About SyncDrop</div>
-      <button class="modal-close" onclick="closeAbout()"><span class="material-icons-round">close</span></button>
+      <div class="modal-title"><span class="material-symbols-rounded">info</span> About SyncDrop</div>
+      <button class="modal-close" onclick="closeAbout()"><span class="material-symbols-rounded">close</span></button>
     </div>
     <div class="modal-body about-scroll">
       <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">How it Works</h3>
@@ -666,22 +673,22 @@ body::after {
           <p>Passionate Developer building seamless and secure web experiences.</p>
           <div style="display:flex; gap:8px; margin-top:12px; flex-wrap:wrap;">
             <a href="https://github.com/SadatPro" target="_blank" class="md-btn md-btn-outlined" style="height:32px; padding:0 12px; font-size:12px; text-decoration:none;">
-              <span class="material-icons-round" style="font-size:14px;">code</span> GitHub
+              <span class="material-symbols-rounded" style="font-size:14px;">code</span> GitHub
             </a>
             <a href="https://www.linkedin.com/in/sadatmahmud1" target="_blank" class="md-btn md-btn-outlined" style="height:32px; padding:0 12px; font-size:12px; text-decoration:none; color:#3b82f6; border-color:rgba(59, 130, 246, 0.4);">
-              <span class="material-icons-round" style="font-size:14px;">person</span> LinkedIn
+              <span class="material-symbols-rounded" style="font-size:14px;">person</span> LinkedIn
             </a>
           </div>
         </div>
       </div>
       <div class="support-card">
-        <h4><span class="material-icons-round">local_cafe</span> Buy me a Coffee</h4>
+        <h4><span class="material-symbols-rounded">local_cafe</span> Buy me a Coffee</h4>
         <p style="font-size:13px; color:var(--text-muted);">If you find SyncDrop useful, consider supporting the developer!</p>
         <div style="margin-top: 16px; font-size: 14px; color: #fff; font-weight: 600;">bKash / Nagad (Send Money)</div>
         <div class="payment-number">
           <span id="dev-payment-number">01309250507</span>
           <button class="copy-btn" id="copy-payment-btn" onclick="copyValue('dev-payment-number', 'copy-payment-btn')" style="padding: 6px 10px; background: rgba(255,255,255,0.1); border-color: transparent; margin-left: 8px;">
-            <span class="material-icons-round" style="font-size: 16px;">content_copy</span>
+            <span class="material-symbols-rounded" style="font-size: 16px;">content_copy</span>
           </button>
         </div>
         <div class="support-qr-wrap"><div id="support-qr"></div></div>
@@ -696,62 +703,39 @@ body::after {
 // CONFIGURATION
 // ══════════════════════════════════════════
 const MAX_SIZE = 500 * 1024 * 1024;
-const CHUNK_SIZE = 64 * 1024;
-const BUFFER_THRESHOLD = 1 * 1024 * 1024;
+// Optimized chunk size for mobile Chromium memory footprint
+const CHUNK_SIZE = 16 * 1024; 
+// Buffered threshold prevents memory bloat and UI freezing
+const BUFFER_THRESHOLD = 512 * 1024; 
 const CIRC = 440;
 
-// FIX 1: Use multiple reliable public TURN servers.
-// The old 'openrelayproject' credentials are heavily throttled/blocked on mobile networks.
-// These servers use the standard open credentials and are well-maintained.
 const ICE_CONFIG = {
   iceServers: [
-    // STUN — always include multiple for redundancy
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' },
-    // TURN — Open Relay (metered.ca) — most reliable free option
     {
       urls: [
         'turn:global.relay.metered.ca:80',
         'turn:global.relay.metered.ca:80?transport=tcp',
         'turn:global.relay.metered.ca:443',
-        'turn:global.relay.metered.ca:443?transport=tcp',
-        'turns:global.relay.metered.ca:443?transport=tcp'
+        'turn:global.relay.metered.ca:443?transport=tcp'
       ],
       username: 'openrelayproject',
       credential: 'openrelayproject'
     },
-    // TURN — Cloudflare STUN (no credential needed, good mobile coverage)
     { urls: 'stun:stun.cloudflare.com:3478' },
-    // TURN — Additional public TURN via Twilio (no auth needed for STUN)
-    { urls: 'stun:global.stun.twilio.com:3478' },
-    // TURN — freestun.net (free public TURN)
-    {
-      urls: [
-        'turn:freestun.net:3478',
-        'turns:freestun.net:5349'
-      ],
-      username: 'free',
-      credential: 'free'
-    }
+    { urls: 'stun:global.stun.twilio.com:3478' }
   ],
-  // FIX 2: These options dramatically improve mobile/cross-network connectivity
-  iceTransportPolicy: 'all',        // Try direct first, fall back to TURN
-  bundlePolicy: 'max-bundle',       // Bundle all media/data on one connection
-  rtcpMuxPolicy: 'require',         // Required for modern mobile browsers
-  iceCandidatePoolSize: 10          // Pre-gather more candidates for faster handshake
+  iceTransportPolicy: 'all',
+  bundlePolicy: 'max-bundle',
+  rtcpMuxPolicy: 'require',
+  iceCandidatePoolSize: 10
 };
 
-// FIX 3: PeerJS server config — use the default PeerJS cloud server
-// which is more reliable than self-hosted for cross-network scenarios.
-// Also set a longer timeout for mobile networks.
 const PEER_CONFIG = {
   debug: 0,
   config: ICE_CONFIG,
-  // Use PeerJS default cloud signaling — reliable across NATs
-  // (no host/port = uses peerjs.com cloud)
 };
 
 let myPeer = null, receiverPeer = null, activeConn = null;
@@ -820,12 +804,12 @@ function updateFilePreviewList() {
     row.className = 'file-preview-row';
     row.style.cssText = 'padding:10px 16px; border-radius:var(--radius-sm); margin-top:0;';
     row.innerHTML = `
-      <div class="md-card-header-icon" style="background:var(--primary-light); width:32px; height:32px;"><span class="material-icons-round" style="font-size:16px">insert_drive_file</span></div>
+      <div class="md-card-header-icon" style="background:var(--primary-light); width:32px; height:32px;"><span class="material-symbols-rounded" style="font-size:16px">insert_drive_file</span></div>
       <div class="file-info" style="margin-left:10px; text-align:left;">
         <div class="file-name" style="font-size:14px; max-width:220px;">${file.name}</div>
         <div class="file-size" style="font-size:11px; margin-top:2px;">${fmtBytes(file.size)}</div>
       </div>
-      <button class="file-remove" style="width:28px; height:28px;" onclick="removeSelectedFile(${index})"><span class="material-icons-round" style="font-size:14px">close</span></button>
+      <button class="file-remove" style="width:28px; height:28px;" onclick="removeSelectedFile(${index})"><span class="material-symbols-rounded" style="font-size:14px">close</span></button>
     `;
     list.appendChild(row);
   });
@@ -861,7 +845,7 @@ function copyValue(srcId, btnId){
   navigator.clipboard.writeText(document.getElementById(srcId).textContent).catch(()=>{});
   const btn = document.getElementById(btnId);
   const orig = btn.innerHTML;
-  btn.innerHTML = '<span class="material-icons-round">check</span> COPIED'; btn.classList.add('copied');
+  btn.innerHTML = '<span class="material-symbols-rounded">check</span> COPIED'; btn.classList.add('copied');
   setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
 }
 function copyShareLink(btnId, isCodeTab=false) {
@@ -870,21 +854,18 @@ function copyShareLink(btnId, isCodeTab=false) {
   navigator.clipboard.writeText(url).catch(()=>{});
   const btn = document.getElementById(btnId);
   const orig = btn.innerHTML;
-  btn.innerHTML = '<span class="material-icons-round">check</span> LINK COPIED'; btn.classList.add('copied');
+  btn.innerHTML = '<span class="material-symbols-rounded">check</span> LINK COPIED'; btn.classList.add('copied');
   setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
 }
 
 // ── PEER FACTORY ─────────────────────────────
-// FIX 4: Better peer initialization with retry logic and explicit connection options.
 function initPeer(customId) {
   return new Promise((resolve, reject) => {
     const id = customId || genCode();
-    // FIX 5: Pass serialization:'binary' explicitly — critical for large file transfers
-    // on mobile where the default JSON serialization fails or is slow.
     const peer = new Peer(id, {
       ...PEER_CONFIG,
-      serialization: 'binary',  // Use binary serialization for performance
-      reliable: true             // Reliable data channel
+      serialization: 'binary',
+      reliable: true
     });
     
     let resolved = false;
@@ -895,9 +876,8 @@ function initPeer(customId) {
     });
     
     peer.on('error', err => {
-      if (resolved) return; // Already resolved, ignore late errors
+      if (resolved) return; 
       if (err.type === 'unavailable-id') {
-        // Retry with a new random ID
         peer.destroy();
         initPeer().then(resolve).catch(reject);
       } else if (err.type === 'network' || err.type === 'disconnected') {
@@ -909,7 +889,6 @@ function initPeer(customId) {
       }
     });
     
-    // Timeout if peer server unreachable
     setTimeout(() => {
       if (!resolved) {
         peer.destroy();
@@ -919,17 +898,12 @@ function initPeer(customId) {
   });
 }
 
-// FIX 6: ICE connection state monitoring — show helpful messages to users
-// on mobile when connection is in progress (can take 5-15 seconds over TURN)
 function monitorIceState(conn, bannerEl, textEl, statusFn) {
   if (!conn.peerConnection) return;
-  
   const pc = conn.peerConnection;
   
   pc.oniceconnectionstatechange = () => {
     const state = pc.iceConnectionState;
-    console.log('ICE state:', state);
-    
     const banner = document.getElementById(bannerEl);
     const text = document.getElementById(textEl);
     
@@ -937,7 +911,7 @@ function monitorIceState(conn, bannerEl, textEl, statusFn) {
       case 'checking':
         if (banner && text) {
           banner.classList.remove('hidden');
-          text.textContent = 'Finding best route… (may take 5-15s on mobile data)';
+          text.textContent = 'Finding best route… (may take 5-15s)';
         }
         if (statusFn) statusFn('info', 'Establishing secure route…');
         break;
@@ -951,23 +925,11 @@ function monitorIceState(conn, bannerEl, textEl, statusFn) {
           text.textContent = 'Direct route failed. Trying relay server…';
         }
         if (statusFn) statusFn('warn', 'Retrying via relay server…');
-        // FIX 7: Attempt ICE restart on failure — critical for mobile networks
-        try { pc.restartIce(); } catch(e) { console.warn('restartIce not supported', e); }
+        try { pc.restartIce(); } catch(e) {}
         break;
       case 'disconnected':
         if (statusFn) statusFn('warn', 'Connection interrupted. Reconnecting…');
         break;
-    }
-  };
-  
-  // FIX 8: Log gathered ICE candidates for debugging
-  pc.onicegatheringstatechange = () => {
-    console.log('ICE gathering:', pc.iceGatheringState);
-  };
-  
-  pc.onicecandidate = (e) => {
-    if (e.candidate) {
-      console.log('ICE candidate type:', e.candidate.type, e.candidate.protocol);
     }
   };
 }
@@ -980,7 +942,7 @@ function cancelTransfer() {
   const sendStartBtn = document.getElementById('send-start-btn');
   sendStartBtn.disabled = false;
   sendStartBtn.className = 'md-btn md-btn-filled md-btn-full';
-  sendStartBtn.innerHTML = '<span class="material-icons-round">rocket_launch</span> GENERATE SYNC LINK';
+  sendStartBtn.innerHTML = '<span class="material-symbols-rounded">rocket_launch</span> GENERATE SYNC LINK';
   document.getElementById('share-active-area').classList.add('hidden');
   document.getElementById('send-viz').classList.add('hidden');
   document.getElementById('send-status-row').className = 'md-status info';
@@ -1046,7 +1008,7 @@ async function startSend(){
   
   try { myPeer = await initPeer(); }
   catch(e){
-    btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">rocket_launch</span> GENERATE SYNC LINK';
+    btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded">rocket_launch</span> GENERATE SYNC LINK';
     alert('Connection failed: ' + (e.message || 'Check your network and try again.'));
     return;
   }
@@ -1059,7 +1021,6 @@ async function startSend(){
   
   myPeer.on('connection', conn => {
     activeConn = conn;
-    // FIX 9: Monitor ICE state for the sender side
     monitorIceState(conn, 'send-ice-banner', 'send-ice-text', setSendStatus);
     conn.on('open', () => {
       document.getElementById('send-status-row').classList.add('hidden');
@@ -1104,20 +1065,14 @@ function sendInChunks(conn){
       return;
     }
     const file = files[fileIndex];
-    // FIX 10: Skip compression on mobile — CompressionStream can crash on
-    // low-memory mobile devices and slows transfers on fast connections.
-    // Only use it if the file is text-like and device has enough headroom.
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    const useComp = !isMobile && typeof CompressionStream !== 'undefined' && file.size > 100*1024;
+    // Removed compression entirely for maximum chromium mobile compatibility and performance
     
     conn.send({
       type: 'file-start', index: fileIndex, name: file.name,
-      size: file.size, mime: file.type, compressed: useComp
+      size: file.size, mime: file.type, compressed: false
     });
     
-    let stream = file.stream();
-    if (useComp) stream = stream.pipeThrough(new CompressionStream('deflate'));
-    reader = stream.getReader();
+    reader = file.stream().getReader();
     sendStreamChunk();
   }
   
@@ -1133,10 +1088,19 @@ function sendInChunks(conn){
       }
       
       let offset = 0;
+      
       while (offset < value.length) {
-        const slice = value.slice(offset, offset + CHUNK_SIZE);
+        // Secure backpressure yielding to event loop for a buttery UI experience
+        const dc = conn.dataChannel;
+        if(dc && dc.bufferedAmount > BUFFER_THRESHOLD) {
+          await new Promise(r => setTimeout(r, 20)); // tiny yield
+          continue; 
+        }
+
+        const sliceSize = Math.min(CHUNK_SIZE, value.length - offset);
+        const slice = value.slice(offset, offset + sliceSize);
         conn.send({type:'chunk', data: slice.buffer});
-        offset += CHUNK_SIZE;
+        offset += sliceSize;
         totalSent += slice.byteLength;
       }
       
@@ -1158,17 +1122,7 @@ function sendInChunks(conn){
         document.getElementById('send-sent').textContent = fmtBytes(totalSent);
       }
       
-      // FIX 11: More aggressive backpressure for mobile — mobile data channels
-      // have much smaller buffers and will drop data if overfilled.
-      const dc = conn.dataChannel;
-      if(dc && dc.bufferedAmount > BUFFER_THRESHOLD) {
-        const wait = Math.min(200, Math.floor(dc.bufferedAmount / BUFFER_THRESHOLD) * 50);
-        setTimeout(sendStreamChunk, wait);
-      } else {
-        // Use setTimeout(0) instead of direct recursion to yield to the event loop
-        // This prevents UI freeze on mobile browsers.
-        setTimeout(sendStreamChunk, 0);
-      }
+      setTimeout(sendStreamChunk, 0); // Keep UI responsive while pushing queue
     } catch(err) {
       console.error('Send stream error:', err);
       setSendStatus('error', 'Transfer error: ' + err.message);
@@ -1197,17 +1151,15 @@ function connectToSender(){
   
   if(receiverPeer) receiverPeer.destroy();
   
-  // FIX 12: Use same PEER_CONFIG with binary serialization on receiver side
   receiverPeer = new Peer({ ...PEER_CONFIG, serialization: 'binary' });
   
   receiverPeer.on('open', () => {
     const conn = receiverPeer.connect(code, {
       reliable: true,
-      serialization: 'binary'  // FIX 13: Must match sender serialization
+      serialization: 'binary'
     });
     activeConn = conn;
     
-    // Monitor ICE state on receiver
     monitorIceState(conn, 'recv-ice-banner', 'recv-ice-text', (type, msg) => setRecvStatus(type, msg));
     
     conn.on('open', () => {
@@ -1223,7 +1175,6 @@ function connectToSender(){
       setRecvStatus('error', 'Connection closed by sender.');
     });
     
-    // FIX 14: Longer timeout for mobile networks (60s → 90s)
     setTimeout(()=>{ if(!conn.open) setRecvStatus('error','Could not reach sender. Make sure both devices are online and the code is correct.'); }, 90000);
   });
   
@@ -1254,16 +1205,12 @@ function listenForFile(conn){
   async function processReceivedFile(meta, chunks, cb) {
     try {
       let blob = new Blob(chunks, { type: meta.mime || 'application/octet-stream' });
-      if (meta.compressed && typeof DecompressionStream !== 'undefined') {
-        const ds = new DecompressionStream('deflate');
-        const decompressedStream = blob.stream().pipeThrough(ds);
-        blob = await new Response(decompressedStream).blob();
-      }
+      // Clean processing without heavy decompression hooks
       const url = URL.createObjectURL(blob);
       receivedFiles.push({ name: meta.name, size: meta.size, mime: meta.mime, blob: blob, url: url });
       filesProcessed++;
       if(cb) cb(); else checkFinish();
-    } catch(e) { console.error('Decompression err:', e); filesProcessed++; checkFinish(); }
+    } catch(e) { console.error('Processing err:', e); filesProcessed++; checkFinish(); }
   }
 
   function checkFinish() {
@@ -1308,8 +1255,7 @@ function listenForFile(conn){
     else if (msg.type === 'batch-done') {
       batchDoneReceived = true; checkFinish();
     }
-    // Backward compat
-    else if (msg.type === 'meta') {
+    else if (msg.type === 'meta') { // Backward compat
       receivedBatchMeta = { count: 1, totalSize: msg.size, files: [msg] };
       totalBatchSize = msg.size; currentFileMeta = msg; currentFileChunks = [];
     }
@@ -1353,13 +1299,13 @@ function finishReceiveBatch(stopStream){
       row.className = 'file-preview-row';
       row.style.cssText = 'padding:10px 16px; border-radius:var(--radius-sm); margin-top:0; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.05);';
       row.innerHTML = `
-        <div class="md-card-header-icon" style="background:var(--primary-light); width:32px; height:32px;"><span class="material-icons-round" style="font-size:16px">insert_drive_file</span></div>
+        <div class="md-card-header-icon" style="background:var(--primary-light); width:32px; height:32px;"><span class="material-symbols-rounded" style="font-size:16px">insert_drive_file</span></div>
         <div class="file-info" style="margin-left:10px; text-align:left;">
           <div class="file-name" style="font-size:14px; max-width:180px;">${file.name}</div>
           <div class="file-size" style="font-size:11px; margin-top:2px;">${fmtBytes(file.size)}</div>
         </div>
         <button class="md-btn md-btn-filled" style="padding:0 14px; height:32px; font-size:12px; border-radius:var(--radius-sm);" onclick="downloadBatchFile(${index})">
-          <span class="material-icons-round" style="font-size:14px">save_alt</span> SAVE
+          <span class="material-symbols-rounded" style="font-size:14px">save_alt</span> SAVE
         </button>
       `;
       filesListEl.appendChild(row);
@@ -1489,7 +1435,7 @@ async function startCodeShare(){
   const btn = document.getElementById('code-share-start-btn');
   btn.disabled = true; btn.innerHTML = '<div class="logo-spinner"></div> GENERATING...';
   try { codeSharePeer = await initPeer(); }
-  catch(e){ btn.disabled = false; btn.innerHTML = '<span class="material-icons-round">share</span> GENERATE SYNC LINK'; alert('Network error: ' + e.message); return; }
+  catch(e){ btn.disabled = false; btn.innerHTML = '<span class="material-symbols-rounded">share</span> GENERATE SYNC LINK'; alert('Network error: ' + e.message); return; }
   
   const shareId = codeSharePeer.id;
   document.getElementById('my-code-share').textContent = shareId;
@@ -1542,8 +1488,8 @@ function copyReceivedCode(){
   if(!receivedCodeData)return;
   navigator.clipboard.writeText(receivedCodeData.content).catch(()=>{});
   const btn = document.getElementById('copy-recv-code-btn');
-  btn.innerHTML = '<span class="material-icons-round" style="font-size:16px">check</span> COPIED';
-  setTimeout(() => btn.innerHTML = '<span class="material-icons-round" style="font-size:16px">content_copy</span> COPY', 2000);
+  btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px">check</span> COPIED';
+  setTimeout(() => btn.innerHTML = '<span class="material-symbols-rounded" style="font-size:16px">content_copy</span> COPY', 2000);
 }
 
 function downloadCodeFile(){
