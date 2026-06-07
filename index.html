@@ -743,18 +743,21 @@ const ICE_CONFIG = {
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
     { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+    { urls: 'stun:stun.services.mozilla.com' },
+    { urls: 'stun:stun.sipgate.net:10000' },
     {
-      urls: 'turn:openrelay.metered.ca:80',
+      urls: 'turn:global.relay.metered.ca:80',
       username: 'openrelayproject',
       credential: 'openrelayproject'
     },
     {
-      urls: 'turn:openrelay.metered.ca:443',
+      urls: 'turn:global.relay.metered.ca:443',
       username: 'openrelayproject',
       credential: 'openrelayproject'
     },
     {
-      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+      urls: 'turn:global.relay.metered.ca:443?transport=tcp',
       username: 'openrelayproject',
       credential: 'openrelayproject'
     }
@@ -920,7 +923,20 @@ async function startSend(){
   generateQR(id);
   document.getElementById('step-send-btn').classList.add('hidden');
   document.getElementById('send-lbl').textContent='WAITING';
+  myPeer.on('error', err => {
+    showSendStatus('error', 'Signaling connection error: ' + (err.message || err.type));
+  });
   myPeer.on('connection', conn => {
+    if (conn.peerConnection) {
+      conn.peerConnection.oniceconnectionstatechange = () => {
+        const state = conn.peerConnection.iceConnectionState;
+        console.log('ICE connection state:', state);
+        if (state === 'checking') showSendStatus('info', 'Connecting over internet (gathering routes)…');
+        if (state === 'failed' || state === 'disconnected') {
+          showSendStatus('error', 'Internet P2P connection failed. Check NAT/firewall.');
+        }
+      };
+    }
     conn.on('open', () => { document.getElementById('send-lbl').textContent='SENDING'; showSendStatus('info','Connected — sending…'); sendInChunks(conn); });
     conn.on('error', () => showSendStatus('error','Connection error.'));
   });
@@ -985,6 +1001,16 @@ function connectToSender(){
   receiverPeer.on('open', () => {
     receiverPeer.on('disconnected', () => { try { receiverPeer.reconnect(); } catch(e){} });
     const conn=receiverPeer.connect(code);
+    if (conn.peerConnection) {
+      conn.peerConnection.oniceconnectionstatechange = () => {
+        const state = conn.peerConnection.iceConnectionState;
+        console.log('ICE connection state:', state);
+        if (state === 'checking') setRecvStatus('info', '<div class="md-spinner"></div><span>Establishing route over internet…</span>');
+        if (state === 'failed' || state === 'disconnected') {
+          setRecvStatus('error', '<span>Internet P2P route failed. Try again.</span>');
+        }
+      };
+    }
     conn.on('open', () => {
       setRecvStatus('success','<div class="status-dot pulse"></div><span>Connected! Receiving…</span>');
       document.getElementById('recv-file-card').classList.remove('hidden');
@@ -1215,7 +1241,24 @@ async function startCodeShare(){
   document.getElementById('my-code-share').textContent=shareId;
   document.getElementById('code-share-waiting-area').classList.add('hidden');
   document.getElementById('code-share-ready').classList.remove('hidden');
+  codeSharePeer.on('error', err => {
+    document.getElementById('code-share-status-text').textContent='Signaling error: ' + (err.message || err.type);
+    document.getElementById('code-share-status').className='md-status error';
+  });
   codeSharePeer.on('connection', conn => {
+    if (conn.peerConnection) {
+      conn.peerConnection.oniceconnectionstatechange = () => {
+        const state = conn.peerConnection.iceConnectionState;
+        console.log('ICE connection state:', state);
+        if (state === 'checking') {
+          document.getElementById('code-share-status-text').textContent='Connecting over internet (gathering routes)…';
+        }
+        if (state === 'failed' || state === 'disconnected') {
+          document.getElementById('code-share-status-text').textContent='Internet P2P connection failed. Check NAT/firewall.';
+          document.getElementById('code-share-status').className='md-status error';
+        }
+      };
+    }
     conn.on('open', () => {
       document.getElementById('code-share-status-text').textContent='Sending code…';
       conn.send({type:'code',lang:currentLang,filename:document.getElementById('code-filename').value,content:code});
@@ -1241,6 +1284,16 @@ function connectForCode(){
   codeRecvPeer.on('open', () => {
     codeRecvPeer.on('disconnected', () => { try { codeRecvPeer.reconnect(); } catch(e){} });
     const conn=codeRecvPeer.connect(code);
+    if (conn.peerConnection) {
+      conn.peerConnection.oniceconnectionstatechange = () => {
+        const state = conn.peerConnection.iceConnectionState;
+        console.log('ICE connection state:', state);
+        if (state === 'checking') setCodeRecvStatus('info', '<div class="md-spinner"></div><span>Establishing route over internet…</span>');
+        if (state === 'failed' || state === 'disconnected') {
+          setCodeRecvStatus('error', '<span>Internet P2P route failed. Try again.</span>');
+        }
+      };
+    }
     conn.on('open', () => setCodeRecvStatus('info','<div class="md-spinner"></div><span>Connected! Waiting…</span>'));
     conn.on('data', msg => { if(msg.type==='code') receiveCode(msg); });
     conn.on('error', () => setCodeRecvStatus('error','<span>Connection failed.</span>'));
