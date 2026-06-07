@@ -1277,7 +1277,7 @@ function connectToSender(){
   if(receiverPeer)receiverPeer.destroy();
   receiverPeer=new Peer();
   receiverPeer.on('open',()=>{
-    const conn=receiverPeer.connect(code,{reliable:true});
+    const conn=receiverPeer.connect(code);
     conn.on('open',()=>{setRecvStatus('success','<div class="status-dot pulse"></div><span>Connected! Receiving…</span>');document.getElementById('recv-file-card').classList.remove('hidden');document.getElementById('recv-lbl').textContent='RECEIVING';listenForFile(conn);});
     conn.on('error',()=>setRecvStatus('error','<span>Connection failed. Check code.</span>'));
     setTimeout(()=>{if(!conn.open)setRecvStatus('error','<span>Could not reach sender.</span>');},10000);
@@ -1339,7 +1339,7 @@ async function startCamera(){
   const video=document.getElementById('cam-video'),permMsg=document.getElementById('cam-permission-msg'),permText=document.getElementById('cam-permission-text');
   permMsg.classList.remove('hidden');permText.textContent='Requesting camera access…\nAllow access to scan QR codes.';
   try{
-    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:1280}}});
+    scanStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment',width:{ideal:1280},height:{ideal:720}}});
     video.srcObject=scanStream;await video.play();permMsg.classList.add('hidden');setScanStatus('scanning','Scanning… point at the QR code');tickScan();
   }catch(err){
     permMsg.classList.remove('hidden');
@@ -1354,13 +1354,19 @@ function tickScan(){
   if(!scanActive)return;
   const video=document.getElementById('cam-video'),canvas=document.getElementById('cam-canvas');
   if(video.readyState===video.HAVE_ENOUGH_DATA){
-    const size=Math.min(video.videoWidth,video.videoHeight);
-    canvas.width=size;canvas.height=size;
-    const ctx=canvas.getContext('2d');
-    ctx.drawImage(video,(video.videoWidth-size)/2,(video.videoHeight-size)/2,size,size,0,0,size,size);
-    if(typeof jsQR!=='undefined'){
-      const r=jsQR(ctx.getImageData(0,0,size,size).data,size,size,{inversionAttempts:'dontInvert'});
-      if(r){onQRFound(r.data);return;}
+    const w=video.videoWidth;
+    const h=video.videoHeight;
+    if(w>0 && h>0){
+      const size=Math.min(w,h);
+      canvas.width=size;canvas.height=size;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(video,(w-size)/2,(h-size)/2,size,size,0,0,size,size);
+      if(typeof jsQR!=='undefined'){
+        const r=jsQR(ctx.getImageData(0,0,size,size).data,size,size,{inversionAttempts:'attemptBoth'});
+        if(r){onQRFound(r.data);return;}
+      } else {
+        setScanStatus('error','Scanning library not loaded');
+      }
     }
   }
   scanRaf=requestAnimationFrame(tickScan);
@@ -1511,7 +1517,7 @@ function connectForCode(){
   if(codeRecvPeer)codeRecvPeer.destroy();
   codeRecvPeer=new Peer();
   codeRecvPeer.on('open',()=>{
-    const conn=codeRecvPeer.connect(code,{reliable:true});
+    const conn=codeRecvPeer.connect(code);
     conn.on('open',()=>setCodeRecvStatus('info','<div class="md-spinner"></div><span>Connected! Waiting…</span>'));
     conn.on('data',msg=>{if(msg.type==='code')receiveCode(msg);});
     conn.on('error',()=>setCodeRecvStatus('error','<span>Connection failed.</span>'));
