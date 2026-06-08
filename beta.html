@@ -362,9 +362,6 @@ body::before {
   </div>
   <div class="header-actions">
     <div class="app-bar-chip">SECURE P2P</div>
-    <button class="coffee-btn" style="padding: 10px; width: 44px; justify-content: center;" onclick="openSettings()" title="Network Settings">
-      <span class="material-icons-round">settings</span>
-    </button>
     <button class="coffee-btn" onclick="openAbout()" title="Support & About">
       <span class="material-icons-round">local_cafe</span>
       <span class="coffee-text">Buy me a Coffee</span>
@@ -747,12 +744,16 @@ function getPeerConfig() {
   }
 
   // DEFAULT BEHAVIOR (Matches beta.html)
-  // By NOT specifying host, port, or iceServers, PeerJS will automatically:
-  // 1. Connect to the default 0.peerjs.com signaling server
-  // 2. Fetch reliable free TURN servers from the cloud automatically
-  // This solves the internet connection / NAT traversal bug.
+  // Include standard STUN servers to fix local network (mDNS) issues between mobile and desktop
   return {
-    debug: 2
+    debug: 2,
+    config: {
+      iceServers: [
+        { urls: 'stun:stun.l.google.com:19302' },
+        { urls: 'stun:stun.cloudflare.com:3478' },
+        { urls: 'stun:stun.services.mozilla.com' }
+      ]
+    }
   };
 }
 
@@ -1519,7 +1520,7 @@ function connectForCode(){
   if(!code||code.length<6){setCodeRecvStatus('warn','Enter a valid 6-digit code.');return;}
   setCodeRecvStatus('info','Connecting…');
   if(codeRecvPeer){try{codeRecvPeer.destroy();}catch(e){}}
-  codeRecvPeer=new Peer(PEER_CONFIG);
+  codeRecvPeer=new Peer(getPeerConfig());
   codeRecvPeer.on('open',()=>{
     const conn=codeRecvPeer.connect(code,{reliable:true,serialization:'json'});
     conn.on('open',()=>setCodeRecvStatus('info','Connected! Fetching code…'));
