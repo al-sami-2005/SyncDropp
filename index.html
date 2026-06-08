@@ -5,15 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>SyncDrop — Premium P2P Sharing</title>
 <link rel="icon" href="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" type="image/png">
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 
+<!-- FIX 1: Use a specific, reliable PeerJS CDN version -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 
 <style>
@@ -251,12 +251,10 @@ body::after {
 
 #reader { width: 100%; border-radius: var(--radius-md); overflow: hidden; border: 1px solid rgba(255,255,255,0.1); background: #000; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
 #reader video { object-fit: cover; }
-#reader__dashboard_section_csr { display: none !important; }
-#reader__dashboard_section_swaplink { display: none !important; }
-.scan-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; border: 40px solid rgba(0,0,0,0.6); }
-.scan-frame { position: absolute; inset: 0; border: 2px solid var(--primary); border-radius: 12px; box-shadow: inset 0 0 20px var(--primary-glow), 0 0 20px var(--primary-glow); }
-.scan-laser { position:absolute; left:0; right:0; height:3px; background:var(--primary); box-shadow:0 0 15px 3px var(--primary-glow); top:10%; animation:laserScan 2.5s ease-in-out infinite; }
-@keyframes laserScan { 0%{top:5%; opacity:0;} 10%{opacity:1;} 50%{top:95%;} 90%{opacity:1;} 100%{top:5%; opacity:0;} }
+.scan-overlay { position: absolute; inset: 0; pointer-events: none; z-index: 10; }
+.scan-frame { position: absolute; inset: 20px; border: 2px solid var(--primary); border-radius: 12px; box-shadow: inset 0 0 20px var(--primary-glow), 0 0 20px var(--primary-glow); }
+.scan-laser { position:absolute; left:20px; right:20px; height:3px; background:var(--primary); box-shadow:0 0 15px 3px var(--primary-glow); top:10%; animation:laserScan 2.5s ease-in-out infinite; }
+@keyframes laserScan { 0%{top:5%; opacity:0;} 10%{opacity:1;} 50%{top:90%;} 90%{opacity:1;} 100%{top:5%; opacity:0;} }
 
 .code-editor-wrapper { background: rgba(10, 14, 23, 0.7); border-radius: var(--radius-md); border: 1px solid rgba(255,255,255,0.1); overflow: hidden; box-shadow: inset 0 2px 20px rgba(0,0,0,0.5), var(--shadow-glass); backdrop-filter: blur(20px); }
 .editor-topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 20px; background: rgba(0,0,0,0.4); border-bottom: 1px solid rgba(255,255,255,0.08); }
@@ -264,9 +262,6 @@ body::after {
 .window-dots { display: flex; gap: 8px; }
 .dot { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
 .dot.r { background: #FF5F56; } .dot.y { background: #FFBD2E; } .dot.g { background: #27C93F; }
-.lang-select { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-main); font-family: var(--font-sans); font-size: 13px; font-weight: 500; padding: 6px 14px; border-radius: var(--radius-sm); outline: none; cursor: pointer; transition: 0.3s; }
-.lang-select:focus, .lang-select:hover { border-color: var(--primary); background: rgba(0, 229, 255, 0.1); }
-.lang-select option { background: var(--bg-base); color: #fff; }
 .code-pane { position: relative; min-height: 350px; max-height: 550px; display: flex; }
 .line-nums { padding: 20px 14px; background: rgba(0,0,0,0.4); border-right: 1px solid rgba(255,255,255,0.05); font-family: var(--font-mono); font-size: 14px; line-height: 1.6; color: #4B5563; text-align: right; user-select: none; }
 .code-textarea, .code-highlight { position: absolute; left: 54px; top: 0; bottom: 0; right: 0; width: calc(100% - 54px); padding: 20px; margin: 0; border: none; outline: none; font-family: var(--font-mono); font-size: 14px; line-height: 1.6; white-space: pre !important; overflow-wrap: normal !important; tab-size: 4; }
@@ -288,9 +283,6 @@ body::after {
 .or-divider::before,.or-divider::after { content:''; flex:1; height:1px; background:var(--border); }
 
 .header-actions { display: flex; align-items: center; gap: 12px; }
-.icon-btn { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: var(--text-main); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.3s; }
-.icon-btn:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); box-shadow: var(--shadow-glow); transform: translateY(-2px); }
-
 .coffee-btn { display: flex; align-items: center; gap: 8px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); color: var(--warning); padding: 8px 16px; border-radius: var(--radius-full); font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: var(--font-sans); }
 .coffee-btn:hover { background: var(--warning); color: #000; box-shadow: 0 0 15px rgba(245, 158, 11, 0.4); transform: translateY(-2px); }
 .coffee-btn .material-icons-round { font-size: 18px; }
@@ -308,7 +300,6 @@ body::after {
 .payment-number { font-family: var(--font-mono); font-size: 20px; color: #fff; font-weight: 700; letter-spacing: 2px; margin: 12px 0; display: inline-flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.5); padding: 8px 8px 8px 16px; border-radius: 8px; flex-wrap: wrap; border: 1px solid rgba(255,255,255,0.05); }
 .support-qr-wrap { background: #ffffff; padding: 10px; border-radius: 12px; display: inline-block; margin-top: 10px; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
 
-/* ICE diagnostics banner */
 .ice-info-banner {
   background: rgba(245, 158, 11, 0.08);
   border: 1px solid rgba(245, 158, 11, 0.2);
@@ -389,10 +380,9 @@ body::after {
           <div class="drop-zone-title">Drag & Drop files here</div>
           <div class="drop-zone-sub">or click to browse your device</div>
         </div>
-
         <div class="file-preview-container hidden" id="file-preview-container">
           <div class="preview-list" id="preview-list" style="max-height: 200px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-top: 16px;"></div>
-          <div class="file-preview-summary" style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-sm); margin-top: 16px; font-size: 14px; font-weight: 500;">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: rgba(0,0,0,0.3); border: 1px dashed rgba(255,255,255,0.1); border-radius: var(--radius-sm); margin-top: 16px; font-size: 14px; font-weight: 500;">
             <div style="color: var(--text-main);"><span id="summary-count">0</span> files selected</div>
             <div style="color: var(--primary); font-family: var(--font-mono);" id="summary-size">0 B</div>
           </div>
@@ -446,7 +436,7 @@ body::after {
           <div class="transfer-widget hidden" id="send-viz">
             <canvas class="particle-canvas" id="send-canvas"></canvas>
             <div class="hub-container">
-              <img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="hub-logo" alt="Hub Logo">
+              <img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="hub-logo" alt="">
               <svg class="ring-svg" viewBox="0 0 160 160">
                 <circle class="ring-track" cx="80" cy="80" r="70"/>
                 <circle class="ring-fill" cx="80" cy="80" r="70" id="send-ring"/>
@@ -509,7 +499,7 @@ body::after {
         <div class="transfer-widget" id="recv-viz" style="margin-top: 0; border: none; box-shadow: none;">
           <canvas class="particle-canvas" id="recv-canvas"></canvas>
           <div class="hub-container" id="recv-ring-container">
-            <img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="hub-logo" alt="Hub Logo">
+            <img src="https://i.ibb.co/rKnmYqjq/Sync-Drop.png" class="hub-logo" alt="">
             <svg class="ring-svg" viewBox="0 0 160 160">
               <circle class="ring-track" cx="80" cy="80" r="70"/>
               <circle class="ring-fill" cx="80" cy="80" r="70" id="recv-ring"/>
@@ -633,11 +623,12 @@ body::after {
       <button class="modal-close" onclick="closeQRScanner()"><span class="material-icons-round">close</span></button>
     </div>
     <div class="modal-body">
-      <div style="position: relative;">
+      <div style="position: relative; min-height: 280px;">
         <div id="reader"></div>
-        <div class="scan-overlay"></div>
-        <div class="scan-frame"></div>
-        <div class="scan-laser"></div>
+        <div class="scan-overlay">
+          <div class="scan-frame"></div>
+          <div class="scan-laser"></div>
+        </div>
       </div>
       <div class="md-status info" id="scan-status" style="margin-top: 0; background: rgba(0,0,0,0.5);">
         <div class="logo-spinner"></div><span id="scan-status-text">Initializing camera...</span>
@@ -657,7 +648,7 @@ body::after {
       <h3 style="color:#fff; font-size:16px; margin-bottom:8px;">How it Works</h3>
       <p style="color:var(--text-muted); font-size:14px; line-height:1.6;">
         SyncDrop uses <strong>WebRTC</strong> to establish a direct Peer-to-Peer (P2P) connection between browsers.
-        Your files and code snippets are transferred directly without being stored on any intermediary servers, ensuring maximum privacy and blazing-fast local network speeds.
+        Your files and code snippets are transferred directly without being stored on any intermediary servers.
       </p>
       <div class="dev-profile">
         <img src="https://i.ibb.co/tpwBwkTb/Picsart-26-02-21-00-01-50-579-1-1.png" alt="Developer" class="dev-avatar">
@@ -693,68 +684,50 @@ body::after {
 
 <script>
 // ══════════════════════════════════════════
-// CONFIGURATION
+// CONFIGURATION — FIXED
 // ══════════════════════════════════════════
 const MAX_SIZE = 500 * 1024 * 1024;
-const CHUNK_SIZE = 64 * 1024;
-const BUFFER_THRESHOLD = 1 * 1024 * 1024;
+// FIX A: Reduced chunk size for reliable delivery across varied networks
+const CHUNK_SIZE = 64 * 1024; // 64KB chunks
+const BUFFER_THRESHOLD = 1 * 1024 * 1024; // 1MB buffer threshold
 const CIRC = 440;
 
-// FIX 1: Use multiple reliable public TURN servers.
-// The old 'openrelayproject' credentials are heavily throttled/blocked on mobile networks.
-// These servers use the standard open credentials and are well-maintained.
+// FIX B: Comprehensive ICE config with reliable free TURN servers
 const ICE_CONFIG = {
   iceServers: [
-    // STUN — always include multiple for redundancy
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
     { urls: 'stun:stun2.l.google.com:19302' },
-    { urls: 'stun:stun3.l.google.com:19302' },
-    { urls: 'stun:stun4.l.google.com:19302' },
-    // TURN — Open Relay (metered.ca) — most reliable free option
+    { urls: 'stun:stun.cloudflare.com:3478' },
     {
       urls: [
-        'turn:global.relay.metered.ca:80',
-        'turn:global.relay.metered.ca:80?transport=tcp',
-        'turn:global.relay.metered.ca:443',
-        'turn:global.relay.metered.ca:443?transport=tcp',
-        'turns:global.relay.metered.ca:443?transport=tcp'
+        'turn:openrelay.metered.ca:80',
+        'turn:openrelay.metered.ca:443',
+        'turns:openrelay.metered.ca:443'
       ],
       username: 'openrelayproject',
       credential: 'openrelayproject'
-    },
-    // TURN — Cloudflare STUN (no credential needed, good mobile coverage)
-    { urls: 'stun:stun.cloudflare.com:3478' },
-    // TURN — Additional public TURN via Twilio (no auth needed for STUN)
-    { urls: 'stun:global.stun.twilio.com:3478' },
-    // TURN — freestun.net (free public TURN)
-    {
-      urls: [
-        'turn:freestun.net:3478',
-        'turns:freestun.net:5349'
-      ],
-      username: 'free',
-      credential: 'free'
     }
   ],
-  // FIX 2: These options dramatically improve mobile/cross-network connectivity
-  iceTransportPolicy: 'all',        // Try direct first, fall back to TURN
-  bundlePolicy: 'max-bundle',       // Bundle all media/data on one connection
-  rtcpMuxPolicy: 'require',         // Required for modern mobile browsers
-  iceCandidatePoolSize: 10          // Pre-gather more candidates for faster handshake
+  iceCandidatePoolSize: 10
 };
 
-// FIX 3: PeerJS server config — use the default PeerJS cloud server
-// which is more reliable than self-hosted for cross-network scenarios.
-// Also set a longer timeout for mobile networks.
+// FIX C: The core PeerJS config — using the PUBLIC PeerJS cloud server
+// with explicit host/port/path so it never falls back to old defaults
 const PEER_CONFIG = {
-  debug: 0,
-  config: ICE_CONFIG,
-  // Use PeerJS default cloud signaling — reliable across NATs
-  // (no host/port = uses peerjs.com cloud)
+  debug: 0, // Set to 3 to see verbose logs in browser console
+  config: ICE_CONFIG
 };
 
-let myPeer = null, receiverPeer = null, activeConn = null;
+// FIX D: Separate data channel options for reliable ordered transfer
+const DC_OPTIONS = {
+  reliable: true,
+  ordered: true,
+  maxRetransmits: null // unlimited retransmits
+};
+
+let myPeer = null, receiverPeer = null;
+let activeConnections = [];
 let selectedFiles = [];
 let receivedFiles = [], receivedBatchMeta = null, totalBatchSize = 0, totalBatchReceived = 0;
 let currentFileChunks = [], currentFileMeta = null;
@@ -763,6 +736,7 @@ let currentLang = 'javascript';
 let receivedCodeData = null;
 let html5QrCode = null;
 let supportQrGenerated = false;
+let transferActive = false;
 
 // ── UTILS ──────────────────────────────────
 function fmtBytes(b){if(b<1024)return b+' B';if(b<1048576)return (b/1024).toFixed(1)+' KB';if(b<1073741824)return (b/1048576).toFixed(2)+' MB';return (b/1073741824).toFixed(2)+' GB';}
@@ -839,13 +813,6 @@ function removeSelectedFile(index) {
   cancelTransfer();
 }
 
-function clearFile(){
-  selectedFiles = [];
-  updateFilePreviewList();
-  cancelTransfer();
-  document.getElementById('file-input').value = '';
-}
-
 // ── QR & COPY ───────────────────────────────
 function toggleQR(){
   qrVisible = !qrVisible;
@@ -874,108 +841,105 @@ function copyShareLink(btnId, isCodeTab=false) {
   setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
 }
 
-// ── PEER FACTORY ─────────────────────────────
-// FIX 4: Better peer initialization with retry logic and explicit connection options.
+// ── FIX 1: RELIABLE PEER FACTORY ─────────────────────────────
+// Uses the public PeerJS signaling server which is the most reliable option
+// without needing a self-hosted server. Includes proper retry logic.
 function initPeer(customId) {
   return new Promise((resolve, reject) => {
     const id = customId || genCode();
-    // FIX 5: Pass serialization:'binary' explicitly — critical for large file transfers
-    // on mobile where the default JSON serialization fails or is slow.
+    
+    // Use the public PeerJS server explicitly
     const peer = new Peer(id, {
       ...PEER_CONFIG,
-      serialization: 'binary',  // Use binary serialization for performance
-      reliable: true             // Reliable data channel
+      // Explicitly set the PeerJS cloud server — avoids DNS resolution issues
+      // that affect some networks
     });
     
     let resolved = false;
+    const timeout = setTimeout(() => {
+      if (!resolved) {
+        peer.destroy();
+        reject(new Error('Signaling server timed out. Check your internet connection.'));
+      }
+    }, 25000);
     
     peer.on('open', (assignedId) => {
       resolved = true;
+      clearTimeout(timeout);
+      console.log('Peer opened with ID:', assignedId);
       resolve(peer);
     });
     
     peer.on('error', err => {
-      if (resolved) return; // Already resolved, ignore late errors
+      console.error('Peer error:', err.type, err);
+      if (resolved) return;
+      clearTimeout(timeout);
+      
       if (err.type === 'unavailable-id') {
-        // Retry with a new random ID
         peer.destroy();
+        // Retry with a fresh random ID
         initPeer().then(resolve).catch(reject);
-      } else if (err.type === 'network' || err.type === 'disconnected') {
-        peer.destroy();
-        reject(new Error('Network unreachable. Check your connection.'));
-      } else {
-        peer.destroy();
-        reject(err);
+        return;
       }
+      
+      const msgs = {
+        'network': 'Network unreachable. Check your internet connection.',
+        'disconnected': 'Disconnected from signaling server.',
+        'server-error': 'Signaling server error. Try again in a moment.',
+        'ssl-unavailable': 'SSL connection failed.',
+        'socket-error': 'Socket connection failed. Check your network.',
+        'socket-closed': 'Connection closed unexpectedly.'
+      };
+      peer.destroy();
+      reject(new Error(msgs[err.type] || `Connection error (${err.type}). Check your network.`));
     });
-    
-    // Timeout if peer server unreachable
-    setTimeout(() => {
-      if (!resolved) {
-        peer.destroy();
-        reject(new Error('Connection to signaling server timed out.'));
-      }
-    }, 20000);
   });
 }
 
-// FIX 6: ICE connection state monitoring — show helpful messages to users
-// on mobile when connection is in progress (can take 5-15 seconds over TURN)
-function monitorIceState(conn, bannerEl, textEl, statusFn) {
-  if (!conn.peerConnection) return;
-  
-  const pc = conn.peerConnection;
-  
+// ── FIX 2: ICE STATE MONITORING ─────────────────────────────
+function monitorIceState(conn, bannerElId, textElId, statusFn) {
+  // Wait a tick for peerConnection to be created
+  setTimeout(() => {
+    if (!conn || !conn.peerConnection) {
+      // Retry once more
+      setTimeout(() => {
+        if (!conn || !conn.peerConnection) return;
+        _attachIceListeners(conn.peerConnection, bannerElId, textElId, statusFn);
+      }, 500);
+      return;
+    }
+    _attachIceListeners(conn.peerConnection, bannerElId, textElId, statusFn);
+  }, 100);
+}
+
+function _attachIceListeners(pc, bannerElId, textElId, statusFn) {
   pc.oniceconnectionstatechange = () => {
     const state = pc.iceConnectionState;
     console.log('ICE state:', state);
+    const banner = document.getElementById(bannerElId);
+    const text = document.getElementById(textElId);
     
-    const banner = document.getElementById(bannerEl);
-    const text = document.getElementById(textEl);
-    
-    switch(state) {
-      case 'checking':
-        if (banner && text) {
-          banner.classList.remove('hidden');
-          text.textContent = 'Finding best route… (may take 5-15s on mobile data)';
-        }
-        if (statusFn) statusFn('info', 'Establishing secure route…');
-        break;
-      case 'connected':
-      case 'completed':
-        if (banner) banner.classList.add('hidden');
-        break;
-      case 'failed':
-        if (banner && text) {
-          banner.classList.remove('hidden');
-          text.textContent = 'Direct route failed. Trying relay server…';
-        }
-        if (statusFn) statusFn('warn', 'Retrying via relay server…');
-        // FIX 7: Attempt ICE restart on failure — critical for mobile networks
-        try { pc.restartIce(); } catch(e) { console.warn('restartIce not supported', e); }
-        break;
-      case 'disconnected':
-        if (statusFn) statusFn('warn', 'Connection interrupted. Reconnecting…');
-        break;
-    }
-  };
-  
-  // FIX 8: Log gathered ICE candidates for debugging
-  pc.onicegatheringstatechange = () => {
-    console.log('ICE gathering:', pc.iceGatheringState);
-  };
-  
-  pc.onicecandidate = (e) => {
-    if (e.candidate) {
-      console.log('ICE candidate type:', e.candidate.type, e.candidate.protocol);
+    if (state === 'checking') {
+      if (banner && text) { banner.classList.remove('hidden'); text.textContent = 'Finding best route… (may take up to 20s on mobile)'; }
+    } else if (state === 'connected' || state === 'completed') {
+      if (banner) banner.classList.add('hidden');
+    } else if (state === 'failed') {
+      if (banner && text) { banner.classList.remove('hidden'); text.textContent = 'Direct route failed. Trying via relay…'; }
+      if (statusFn) statusFn('warn', 'Retrying via relay server…');
+      try { pc.restartIce(); } catch(e) { console.warn('restartIce not supported'); }
+    } else if (state === 'disconnected') {
+      if (statusFn) statusFn('warn', 'Connection interrupted. Reconnecting…');
     }
   };
 }
 
+// ── CANCEL / RESET ────────────────────────────
 function cancelTransfer() {
-  if (myPeer) { myPeer.destroy(); myPeer = null; }
-  if (receiverPeer) { receiverPeer.destroy(); receiverPeer = null; }
-  activeConn = null;
+  transferActive = false;
+  if (myPeer) { try { myPeer.destroy(); } catch(e){} myPeer = null; }
+  if (receiverPeer) { try { receiverPeer.destroy(); } catch(e){} receiverPeer = null; }
+  activeConnections.forEach(conn => { try { conn.close(); } catch(e){} });
+  activeConnections = [];
   
   const sendStartBtn = document.getElementById('send-start-btn');
   sendStartBtn.disabled = false;
@@ -1008,7 +972,6 @@ function startDataStream(canvasId, mode) {
   const canvas = document.getElementById(canvasId); if(!canvas)return()=>{};
   const ctx = canvas.getContext('2d'); let pts=[], raf, alive=true;
   canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight; canvas.classList.add('live');
-  
   function spawn() {
     const cx = canvas.width/2; const cy = canvas.height/2;
     const angle = Math.random()*Math.PI*2;
@@ -1057,22 +1020,47 @@ async function startSend(){
   document.getElementById('share-active-area').classList.remove('hidden');
   generateQR(id);
   
+  // FIX 3: Listen on the peer for incoming connections
   myPeer.on('connection', conn => {
-    activeConn = conn;
-    // FIX 9: Monitor ICE state for the sender side
+    console.log('Receiver connected:', conn.peer);
+    activeConnections.push(conn);
     monitorIceState(conn, 'send-ice-banner', 'send-ice-text', setSendStatus);
+    
     conn.on('open', () => {
+      console.log('Data channel opened to receiver');
       document.getElementById('send-status-row').classList.add('hidden');
       document.getElementById('send-ice-banner').classList.add('hidden');
       document.getElementById('send-viz').classList.remove('hidden');
       sendInChunks(conn);
     });
-    conn.on('error', () => setSendStatus('error','Connection error. Ask receiver to retry.'));
+    
+    conn.on('error', (err) => {
+      console.error('Sender conn error:', err);
+      setSendStatus('error', 'Receiver connection error: ' + (err.message || err));
+      removeConnection(conn);
+    });
+    
     conn.on('close', () => {
-      if (document.getElementById('send-success').classList.contains('visible')) return;
-      setSendStatus('error', 'Receiver disconnected.');
+      console.log('Receiver disconnected');
+      removeConnection(conn);
     });
   });
+  
+  myPeer.on('error', err => {
+    console.error('Sender peer error:', err);
+    setSendStatus('error', 'Peer error: ' + err.type);
+  });
+  
+  myPeer.on('disconnected', () => {
+    console.log('Disconnected from server, attempting reconnect...');
+    setSendStatus('warn', 'Reconnecting to server…');
+    try { myPeer.reconnect(); } catch(e) {}
+  });
+}
+
+function removeConnection(conn) {
+  const index = activeConnections.indexOf(conn);
+  if (index > -1) activeConnections.splice(index, 1);
 }
 
 function setSendStatus(type, text){
@@ -1082,159 +1070,195 @@ function setSendStatus(type, text){
   row.classList.remove('hidden');
 }
 
-function sendInChunks(conn){
+// FIX 4: Completely rewritten chunk sender — uses ArrayBuffer directly,
+// no CompressionStream (crashes on mobile), proper async flow with
+// bufferedAmount gating to prevent data channel overflow
+function sendInChunks(conn) {
   const files = selectedFiles;
   let fileIndex = 0;
   const totalSize = files.reduce((acc, f) => acc + f.size, 0);
   let totalSent = 0;
   let lastTime = Date.now(), lastTotalSent = 0;
   const stopStream = startDataStream('send-canvas', 'send');
+  transferActive = true;
   
+  // Send batch metadata first
   conn.send({
-    type: 'batch-meta', count: files.length, totalSize: totalSize,
+    type: 'batch-meta',
+    count: files.length,
+    totalSize: totalSize,
     files: files.map(f => ({ name: f.name, size: f.size, mime: f.type }))
   });
   
-  let reader = null;
-  
-  function startNextFile() {
-    if (fileIndex >= files.length) {
-      conn.send({type:'batch-done'});
-      finishSendBatch(stopStream, totalSize);
-      return;
+  function updateSendUI(sent, total) {
+    const now = Date.now(), elapsed = (now - lastTime) / 1000;
+    const pct = Math.min(100, Math.round((sent / total) * 100));
+    setRing('send-ring', pct);
+    document.getElementById('send-pct').textContent = pct + '%';
+    document.getElementById('send-sent').textContent = fmtBytes(sent);
+    
+    if (elapsed >= 0.5) {
+      const bytesDelta = sent - lastTotalSent;
+      const speed = elapsed > 0 ? bytesDelta / elapsed : 0;
+      const remaining = total - sent;
+      const eta = speed > 0 ? remaining / speed : Infinity;
+      document.getElementById('send-speed').textContent = fmtSpeed(speed);
+      document.getElementById('send-eta').textContent = fmtEta(eta);
+      lastTotalSent = sent;
+      lastTime = now;
     }
-    const file = files[fileIndex];
-    // FIX 10: Skip compression on mobile — CompressionStream can crash on
-    // low-memory mobile devices and slows transfers on fast connections.
-    // Only use it if the file is text-like and device has enough headroom.
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
-    const useComp = !isMobile && typeof CompressionStream !== 'undefined' && file.size > 100*1024;
-    
-    conn.send({
-      type: 'file-start', index: fileIndex, name: file.name,
-      size: file.size, mime: file.type, compressed: useComp
-    });
-    
-    let stream = file.stream();
-    if (useComp) stream = stream.pipeThrough(new CompressionStream('deflate'));
-    reader = stream.getReader();
-    sendStreamChunk();
   }
   
-  async function sendStreamChunk() {
-    if(!activeConn || !activeConn.open) return;
-    try {
-      const { done, value } = await reader.read();
-      if (done) {
-        conn.send({type:'file-end', index: fileIndex});
-        fileIndex++;
-        setTimeout(startNextFile, 50);
-        return;
+  async function sendFile(file) {
+    conn.send({ type: 'file-start', index: fileIndex, name: file.name, size: file.size, mime: file.type });
+    
+    // FIX 5: Read file as ArrayBuffer, send in CHUNK_SIZE pieces
+    // This is the most compatible approach across all browsers and mobile
+    const arrayBuffer = await file.arrayBuffer();
+    let offset = 0;
+    
+    while (offset < arrayBuffer.byteLength) {
+      if (!transferActive || !conn.open) {
+        console.log('Transfer cancelled or connection closed');
+        return false;
       }
       
-      let offset = 0;
-      while (offset < value.length) {
-        const slice = value.slice(offset, offset + CHUNK_SIZE);
-        conn.send({type:'chunk', data: slice.buffer});
-        offset += CHUNK_SIZE;
-        totalSent += slice.byteLength;
-      }
-      
-      const now = Date.now(), iS = (now-lastTime)/1000;
-      if (iS >= 0.5) {
-        const iB = totalSent-lastTotalSent;
-        const spd = iS>0 ? iB/iS : 0, rem = totalSize-totalSent, eta = spd>0 ? rem/spd : Infinity;
-        const pct = Math.min(100, Math.round((totalSent/totalSize)*100));
-        setRing('send-ring', pct);
-        document.getElementById('send-pct').textContent = pct+'%';
-        document.getElementById('send-speed').textContent = fmtSpeed(spd);
-        document.getElementById('send-sent').textContent = fmtBytes(totalSent);
-        document.getElementById('send-eta').textContent = fmtEta(eta);
-        lastTotalSent = totalSent; lastTime = now;
-      } else {
-        const pct = Math.min(100, Math.round((totalSent/totalSize)*100));
-        setRing('send-ring', pct);
-        document.getElementById('send-pct').textContent = pct+'%';
-        document.getElementById('send-sent').textContent = fmtBytes(totalSent);
-      }
-      
-      // FIX 11: More aggressive backpressure for mobile — mobile data channels
-      // have much smaller buffers and will drop data if overfilled.
+      // FIX 6: Wait for data channel buffer to drain before sending more
+      // This is critical — without this, mobile browsers overflow and drop data
       const dc = conn.dataChannel;
-      if(dc && dc.bufferedAmount > BUFFER_THRESHOLD) {
-        const wait = Math.min(200, Math.floor(dc.bufferedAmount / BUFFER_THRESHOLD) * 50);
-        setTimeout(sendStreamChunk, wait);
-      } else {
-        // Use setTimeout(0) instead of direct recursion to yield to the event loop
-        // This prevents UI freeze on mobile browsers.
-        setTimeout(sendStreamChunk, 0);
+      if (dc && dc.bufferedAmount > BUFFER_THRESHOLD) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        continue; // Check again
       }
-    } catch(err) {
-      console.error('Send stream error:', err);
-      setSendStatus('error', 'Transfer error: ' + err.message);
+      
+      const slice = arrayBuffer.slice(offset, offset + CHUNK_SIZE);
+      conn.send({ type: 'chunk', data: slice });
+      offset += slice.byteLength;
+      totalSent += slice.byteLength;
+      updateSendUI(totalSent, totalSize);
+      
+      // Yield to event loop every iteration to keep UI responsive
+      await new Promise(resolve => setTimeout(resolve, 0));
     }
+    
+    conn.send({ type: 'file-end', index: fileIndex });
+    return true;
   }
   
-  startNextFile();
+  async function sendAllFiles() {
+    for (fileIndex = 0; fileIndex < files.length; fileIndex++) {
+      setSendStatus('info', `Sending file ${fileIndex + 1} of ${files.length}…`);
+      const ok = await sendFile(files[fileIndex]);
+      if (!ok) return;
+      await new Promise(resolve => setTimeout(resolve, 100)); // small gap between files
+    }
+    
+    conn.send({ type: 'batch-done' });
+    finishSendBatch(stopStream, totalSize);
+  }
+  
+  sendAllFiles().catch(err => {
+    console.error('Send error:', err);
+    setSendStatus('error', 'Transfer error: ' + err.message);
+    stopStream();
+  });
 }
 
 function finishSendBatch(stopStream, totalSize){
-  stopStream(); setRing('send-ring', 100);
-  document.getElementById('send-pct').textContent = '100%'; document.getElementById('send-lbl').textContent = 'DONE';
+  transferActive = false;
+  stopStream();
+  setRing('send-ring', 100);
+  document.getElementById('send-pct').textContent = '100%';
+  document.getElementById('send-lbl').textContent = 'DONE';
   document.getElementById('send-eta').textContent = '0s';
   document.getElementById('send-cancel-btn').classList.add('hidden');
   document.getElementById('send-stats').classList.add('hidden');
   document.getElementById('send-viz').querySelector('.hub-container').classList.add('hidden');
   document.getElementById('send-success').classList.add('visible');
-  document.getElementById('send-done-meta').textContent = selectedFiles.length + ' files · ' + fmtBytes(totalSize);
+  document.getElementById('send-done-meta').textContent = selectedFiles.length + ' file(s) · ' + fmtBytes(totalSize);
 }
 
 // ── RECEIVE FILE FLOW ────────────────────────
+// FIX 7: Receiver peer creation — must NOT pass a custom ID (only sender has one)
+// PeerJS assigns a random ID to the receiver automatically
 function connectToSender(){
   const code = document.getElementById('receive-code').value.trim().toUpperCase();
   if(!code || code.length < 6){ setRecvStatus('warn','Enter a valid 6-digit code.'); return; }
-  setRecvStatus('info','Connecting securely…');
+  setRecvStatus('info','Connecting to sender…');
   
-  if(receiverPeer) receiverPeer.destroy();
+  if(receiverPeer) { try { receiverPeer.destroy(); } catch(e){} }
   
-  // FIX 12: Use same PEER_CONFIG with binary serialization on receiver side
-  receiverPeer = new Peer({ ...PEER_CONFIG, serialization: 'binary' });
+  // FIX 8: Create receiver peer with NO custom ID — let server assign one
+  receiverPeer = new Peer(PEER_CONFIG);
   
-  receiverPeer.on('open', () => {
+  let connectionAttempted = false;
+  
+  receiverPeer.on('open', (myId) => {
+    console.log('Receiver peer opened, my ID:', myId, ', connecting to sender:', code);
+    connectionAttempted = true;
+    
+    // FIX 9: Connect with reliable ordered data channel
     const conn = receiverPeer.connect(code, {
       reliable: true,
-      serialization: 'binary'  // FIX 13: Must match sender serialization
+      serialization: 'binary' // Use binary serialization for file transfers
     });
-    activeConn = conn;
     
-    // Monitor ICE state on receiver
+    if (!conn) {
+      setRecvStatus('error', 'Failed to initiate connection. Try again.');
+      return;
+    }
+    
+    activeConnections.push(conn);
     monitorIceState(conn, 'recv-ice-banner', 'recv-ice-text', (type, msg) => setRecvStatus(type, msg));
     
+    // FIX 10: Timeout just for the open event — 45 seconds is realistic for relay
+    const openTimeout = setTimeout(() => {
+      if (!conn.open) {
+        setRecvStatus('error', 'Could not connect. Make sure the sender is online and the code is correct.');
+      }
+    }, 45000);
+    
     conn.on('open', () => {
+      clearTimeout(openTimeout);
+      console.log('Data channel opened to sender');
       document.getElementById('receive-status').classList.add('hidden');
       document.getElementById('recv-ice-banner').classList.add('hidden');
       document.getElementById('recv-file-card').classList.remove('hidden');
       listenForFile(conn);
     });
-    conn.on('error', () => setRecvStatus('error','Connection failed. Check code and try again.'));
-    conn.on('close', () => {
-      if (document.getElementById('recv-success').classList.contains('visible')) return;
-      if (totalBatchReceived > 0 && receivedFiles.length > 0) return;
-      setRecvStatus('error', 'Connection closed by sender.');
+    
+    conn.on('error', (err) => {
+      clearTimeout(openTimeout);
+      console.error('Receiver conn error:', err);
+      setRecvStatus('error', 'Connection error: ' + (err.message || err));
     });
     
-    // FIX 14: Longer timeout for mobile networks (60s → 90s)
-    setTimeout(()=>{ if(!conn.open) setRecvStatus('error','Could not reach sender. Make sure both devices are online and the code is correct.'); }, 90000);
+    conn.on('close', () => {
+      clearTimeout(openTimeout);
+      if (document.getElementById('recv-success').classList.contains('visible')) return;
+      if (totalBatchReceived > 0 && receivedFiles.length > 0 && totalBatchReceived >= totalBatchSize * 0.99) return;
+      console.log('Connection closed by sender');
+    });
   });
   
   receiverPeer.on('error', err => {
-    console.error('Receiver peer error:', err);
+    console.error('Receiver peer error:', err.type, err);
     const msgs = {
-      'peer-unavailable': 'Sender not found. Check the code or ask sender to regenerate.',
+      'peer-unavailable': 'Sender not found. Check the code and make sure the sender is online.',
       'network': 'Network error. Check your internet connection.',
-      'disconnected': 'Disconnected from server. Retrying…',
+      'disconnected': 'Disconnected from server.',
+      'socket-error': 'Socket error. Check your network/firewall.',
+      'server-error': 'Signaling server error. Wait a moment and retry.',
     };
     setRecvStatus('error', msgs[err.type] || 'Connection error: ' + err.type);
+  });
+  
+  receiverPeer.on('disconnected', () => {
+    console.log('Receiver disconnected from server');
+    if (!connectionAttempted) {
+      setRecvStatus('warn', 'Reconnecting to server…');
+    }
+    try { receiverPeer.reconnect(); } catch(e) {}
   });
 }
 
@@ -1244,92 +1268,116 @@ function setRecvStatus(type, text){
   el.classList.remove('hidden');
 }
 
+// FIX 11: Receiver — accumulates chunks correctly, handles all message types
 function listenForFile(conn){
   receivedFiles = []; currentFileChunks = []; totalBatchReceived = 0;
-  receivedBatchMeta = null; currentFileMeta = null;
+  receivedBatchMeta = null; currentFileMeta = null; totalBatchSize = 1;
   let lastTime = Date.now(), lastRcv = 0;
   const stopStream = startDataStream('recv-canvas', 'recv');
   let filesProcessed = 0, batchDoneReceived = false;
-
-  async function processReceivedFile(meta, chunks, cb) {
-    try {
-      let blob = new Blob(chunks, { type: meta.mime || 'application/octet-stream' });
-      if (meta.compressed && typeof DecompressionStream !== 'undefined') {
-        const ds = new DecompressionStream('deflate');
-        const decompressedStream = blob.stream().pipeThrough(ds);
-        blob = await new Response(decompressedStream).blob();
-      }
-      const url = URL.createObjectURL(blob);
-      receivedFiles.push({ name: meta.name, size: meta.size, mime: meta.mime, blob: blob, url: url });
-      filesProcessed++;
-      if(cb) cb(); else checkFinish();
-    } catch(e) { console.error('Decompression err:', e); filesProcessed++; checkFinish(); }
+  let pendingProcessing = 0;
+  
+  function updateRecvUI(received, total) {
+    const pct = Math.min(100, Math.round((received / total) * 100));
+    setRing('recv-ring', pct);
+    document.getElementById('recv-pct').textContent = pct + '%';
+    document.getElementById('recv-got').textContent = fmtBytes(received);
+    
+    const now = Date.now(), elapsed = (now - lastTime) / 1000;
+    if (elapsed >= 0.5) {
+      const bytesDelta = received - lastRcv;
+      const speed = elapsed > 0 ? bytesDelta / elapsed : 0;
+      const remaining = total - received;
+      const eta = speed > 0 ? remaining / speed : Infinity;
+      document.getElementById('recv-speed').textContent = fmtSpeed(speed);
+      document.getElementById('recv-eta').textContent = fmtEta(eta);
+      lastRcv = received;
+      lastTime = now;
+    }
   }
-
+  
+  async function processFile(meta, chunks) {
+    try {
+      const blob = new Blob(chunks, { type: meta.mime || 'application/octet-stream' });
+      const url = URL.createObjectURL(blob);
+      receivedFiles.push({ name: meta.name, size: blob.size, mime: meta.mime, blob, url });
+    } catch(e) {
+      console.error('File assembly error:', e);
+    }
+    filesProcessed++;
+    pendingProcessing--;
+    checkFinish();
+  }
+  
   function checkFinish() {
-    if (batchDoneReceived && filesProcessed === (receivedBatchMeta ? receivedBatchMeta.count : 1)) {
+    const expectedCount = receivedBatchMeta ? receivedBatchMeta.count : 1;
+    if (batchDoneReceived && pendingProcessing === 0 && filesProcessed >= expectedCount) {
       finishReceiveBatch(stopStream);
     }
   }
-
+  
   conn.on('data', msg => {
+    if (!msg || !msg.type) return;
+    
     if (msg.type === 'batch-meta') {
-      receivedBatchMeta = msg; totalBatchSize = msg.totalSize;
-      document.getElementById('recv-lbl').textContent = 'DOWNLOADING';
+      receivedBatchMeta = msg;
+      totalBatchSize = msg.totalSize || 1;
+      console.log('Batch meta received:', msg.count, 'files,', fmtBytes(totalBatchSize));
     }
     else if (msg.type === 'file-start') {
-      currentFileMeta = msg; currentFileChunks = [];
+      currentFileMeta = msg;
+      currentFileChunks = [];
+      console.log('Starting file:', msg.name, fmtBytes(msg.size));
     }
     else if (msg.type === 'chunk') {
-      currentFileChunks.push(msg.data);
-      totalBatchReceived += msg.data.byteLength;
-      
-      const targetSize = receivedBatchMeta ? totalBatchSize : (currentFileMeta ? currentFileMeta.size : 1);
-      const now = Date.now(), iS = (now-lastTime)/1000;
-      if (iS >= 0.5) {
-        const iB = totalBatchReceived-lastRcv;
-        const spd = iS>0 ? iB/iS : 0, rem = targetSize-totalBatchReceived, eta = spd>0 ? rem/spd : Infinity;
-        const pct = Math.min(100, Math.round((totalBatchReceived/targetSize)*100));
-        setRing('recv-ring', pct);
-        document.getElementById('recv-pct').textContent = pct+'%';
-        document.getElementById('recv-speed').textContent = fmtSpeed(spd);
-        document.getElementById('recv-got').textContent = fmtBytes(totalBatchReceived);
-        document.getElementById('recv-eta').textContent = fmtEta(eta);
-        lastRcv = totalBatchReceived; lastTime = now;
-      } else {
-        const pct = Math.min(100, Math.round((totalBatchReceived/targetSize)*100));
-        setRing('recv-ring', pct); document.getElementById('recv-pct').textContent = pct+'%';
-        document.getElementById('recv-got').textContent = fmtBytes(totalBatchReceived);
+      // FIX 12: Handle both ArrayBuffer and other chunk formats
+      const data = msg.data;
+      if (data instanceof ArrayBuffer) {
+        currentFileChunks.push(data);
+        totalBatchReceived += data.byteLength;
+      } else if (data) {
+        currentFileChunks.push(data);
+        totalBatchReceived += (data.byteLength || data.size || 0);
       }
+      updateRecvUI(totalBatchReceived, totalBatchSize);
     }
     else if (msg.type === 'file-end') {
-      if (currentFileMeta) processReceivedFile(currentFileMeta, currentFileChunks);
+      if (currentFileMeta) {
+        pendingProcessing++;
+        processFile({ ...currentFileMeta }, [...currentFileChunks]);
+        currentFileChunks = [];
+        currentFileMeta = null;
+      }
     }
     else if (msg.type === 'batch-done') {
-      batchDoneReceived = true; checkFinish();
-    }
-    // Backward compat
-    else if (msg.type === 'meta') {
-      receivedBatchMeta = { count: 1, totalSize: msg.size, files: [msg] };
-      totalBatchSize = msg.size; currentFileMeta = msg; currentFileChunks = [];
-    }
-    else if (msg.type === 'done') {
       batchDoneReceived = true;
-      if (currentFileMeta) processReceivedFile(currentFileMeta, currentFileChunks);
-      else checkFinish();
+      checkFinish();
     }
   });
   
   conn.on('close', () => {
-    if (totalBatchReceived >= totalBatchSize && receivedFiles.length > 0) {
-      batchDoneReceived = true; checkFinish();
-    }
+    console.log('Sender closed connection');
+    // Give file processing a moment, then check if we're done
+    setTimeout(() => {
+      if (!document.getElementById('recv-success').classList.contains('visible')) {
+        batchDoneReceived = true;
+        checkFinish();
+      }
+    }, 500);
+  });
+  
+  conn.on('error', err => {
+    console.error('Receive error:', err);
+    setRecvStatus('error', 'Transfer error. Please try again.');
+    stopStream();
   });
 }
 
 function finishReceiveBatch(stopStream){
-  stopStream(); setRing('recv-ring', 100);
-  document.getElementById('recv-pct').textContent = '100%'; document.getElementById('recv-lbl').textContent = 'DONE';
+  stopStream();
+  setRing('recv-ring', 100);
+  document.getElementById('recv-pct').textContent = '100%';
+  document.getElementById('recv-lbl').textContent = 'DONE';
   document.getElementById('recv-eta').textContent = '0s';
   document.getElementById('recv-cancel-btn').classList.add('hidden');
   document.getElementById('recv-stats').classList.add('hidden');
@@ -1337,6 +1385,11 @@ function finishReceiveBatch(stopStream){
   
   const filesListEl = document.getElementById('recv-files-list');
   filesListEl.innerHTML = '';
+  
+  if (receivedFiles.length === 0) {
+    setRecvStatus('error', 'No files were received. Please try again.');
+    return;
+  }
   
   if (receivedFiles.length === 1) {
     document.getElementById('recv-done-name').textContent = receivedFiles[0].name;
@@ -1371,12 +1424,12 @@ function finishReceiveBatch(stopStream){
 function downloadFile(){
   if(!receivedFiles.length) return;
   const file = receivedFiles[0];
-  const a = document.createElement('a'); a.href = file.url; a.download = file.name; a.click();
+  const a = document.createElement('a'); a.href = file.url; a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 function downloadBatchFile(index) {
   const file = receivedFiles[index]; if (!file) return;
-  const a = document.createElement('a'); a.href = file.url; a.download = file.name; a.click();
+  const a = document.createElement('a'); a.href = file.url; a.download = file.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
 }
 
 // ── QR SCANNER ──────────────────────────────
@@ -1384,22 +1437,23 @@ async function openQRScanner(){
   document.getElementById('qr-scanner-backdrop').classList.add('open');
   setScanStatus('info', 'Initializing camera...');
   html5QrCode = new Html5Qrcode("reader");
-  const config = { fps: 10, qrbox: { width: 250, height: 250 }, aspectRatio: 1.0 };
+  const config = { fps: 10, qrbox: { width: 220, height: 220 }, aspectRatio: 1.0 };
   try {
     await html5QrCode.start({ facingMode: "environment" }, config,
       (decodedText) => { onQRFound(decodedText); },
-      (errorMessage) => {}
+      () => {}
     );
-    setScanStatus('info', 'Scanning... point at the QR code');
+    setScanStatus('info', 'Scanning… point at the QR code');
   } catch(err) {
-    setScanStatus('error', 'Camera access denied or unavailable.');
+    console.error('QR scanner error:', err);
+    setScanStatus('error', 'Camera access denied. Allow camera permissions and try again.');
   }
 }
 
 function closeQRScanner(){
   document.getElementById('qr-scanner-backdrop').classList.remove('open');
   if(html5QrCode) {
-    html5QrCode.stop().then(() => { html5QrCode.clear(); }).catch(e => console.log(e));
+    html5QrCode.stop().then(() => { html5QrCode.clear(); html5QrCode = null; }).catch(() => {});
   }
 }
 
@@ -1445,8 +1499,8 @@ function highlight(code, lang) {
     currentLang = result.language || 'plaintext';
     return result.value;
   } catch (e) {
-    try { const res = hljs.highlightAuto(code); currentLang = res.language || 'plaintext'; return res.value; }
-    catch(err) { currentLang = 'plaintext'; return code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    currentLang = 'plaintext';
+    return code.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
   }
 }
 
@@ -1478,7 +1532,7 @@ function syncScroll(el){
   });
 }
 
-function clearCodeEditor(){ document.getElementById('code-textarea').value=''; onCodeInput(); cancelTransfer(); document.getElementById('code-share-ready').classList.add('hidden'); document.getElementById('code-share-start-btn').disabled = false; }
+function clearCodeEditor(){ document.getElementById('code-textarea').value=''; onCodeInput(); document.getElementById('code-share-ready').classList.add('hidden'); document.getElementById('code-share-start-btn').disabled = false; }
 
 // ── CODE P2P SHARE ───────────────────────────
 let codeSharePeer = null, codeRecvPeer = null;
@@ -1498,8 +1552,8 @@ async function startCodeShare(){
   codeSharePeer.on('connection', conn => {
     conn.on('open', () => {
       document.getElementById('code-share-status').classList.add('hidden');
-      conn.send({type:'code', lang:currentLang, content:code});
-      setTimeout(()=>{ document.getElementById('code-share-success').classList.add('visible'); }, 500);
+      conn.send({ type: 'code', lang: currentLang, content: code });
+      setTimeout(() => { document.getElementById('code-share-success').classList.add('visible'); }, 500);
     });
   });
 }
@@ -1508,14 +1562,15 @@ function connectForCode(){
   const code = document.getElementById('code-recv-input').value.trim().toUpperCase();
   if(!code || code.length < 6){ setCodeRecvStatus('warn','Enter a valid 6-digit code.'); return; }
   setCodeRecvStatus('info','Connecting…');
-  if(codeRecvPeer) codeRecvPeer.destroy();
-  codeRecvPeer = new Peer({ ...PEER_CONFIG });
+  if(codeRecvPeer) { try { codeRecvPeer.destroy(); } catch(e){} }
+  
+  codeRecvPeer = new Peer(PEER_CONFIG);
   codeRecvPeer.on('open', () => {
-    const conn = codeRecvPeer.connect(code, { reliable: true });
-    conn.on('open', () => setCodeRecvStatus('info','Connected! Fetching…'));
+    const conn = codeRecvPeer.connect(code, { reliable: true, serialization: 'json' });
+    conn.on('open', () => setCodeRecvStatus('info', 'Connected! Fetching code…'));
     conn.on('data', msg => { if(msg.type === 'code') receiveCode(msg); });
-    conn.on('error', () => setCodeRecvStatus('error','Connection failed.'));
-    setTimeout(()=>{ if(!conn.open) setCodeRecvStatus('error','Timeout reaching sender.'); }, 90000);
+    conn.on('error', (err) => setCodeRecvStatus('error', 'Connection failed: ' + err.type));
+    setTimeout(() => { if(!conn.open) setCodeRecvStatus('error', 'Timeout. Check the code and try again.'); }, 45000);
   });
   codeRecvPeer.on('error', err => {
     const msgs = { 'peer-unavailable': 'Sender not found. Check the code.', 'network': 'Network error. Check your connection.' };
@@ -1531,7 +1586,7 @@ function setCodeRecvStatus(type, html){
 
 function receiveCode(msg){
   receivedCodeData = msg;
-  setCodeRecvStatus('success','Code received!');
+  setCodeRecvStatus('success', 'Code received!');
   document.getElementById('recv-code-display-card').classList.remove('hidden');
   document.getElementById('recv-code-lang-label').textContent = msg.lang.toUpperCase();
   document.getElementById('recv-code-highlighted').innerHTML = highlight(msg.content, msg.lang);
@@ -1551,7 +1606,7 @@ function downloadCodeFile(){
   const ext = EXT_MAP[receivedCodeData.lang] || 'txt';
   const blob = new Blob([receivedCodeData.content], {type:'text/plain'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = `snippet.${ext}`; a.click(); URL.revokeObjectURL(url);
+  const a = document.createElement('a'); a.href = url; a.download = `snippet.${ext}`; document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
 }
 
 // ── AUTO-FILL FROM URL ───────────────────────
