@@ -1146,20 +1146,33 @@ function sendInChunks(conn){
     });
   }
 
+  // Helper to read a slice of the file into an ArrayBuffer asynchronously
+  function readSlice(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = e => reject(e);
+      reader.readAsArrayBuffer(blob);
+    });
+  }
+
   async function sendFile(file,fileIndex){
     ctrl({type:'file-start',index:fileIndex,name:file.name,size:file.size,mime:file.type});
-    const ab=await file.arrayBuffer();
+    
     let offset=0,localChunks=0;
     dc=conn.dataChannel;
 
-    while(offset<ab.byteLength){
+    while(offset<file.size){
       if(!transferActive||!conn.open)return false;
       // GOD MODE backpressure: pause if buffer is too full
       if(dc&&dc.bufferedAmount>BUFFER_HIGH){
         await waitDrain(dc);
         if(!transferActive||!conn.open)return false;
       }
-      const chunk=ab.slice(offset,offset+CHUNK_SIZE);
+      
+      const slice = file.slice(offset, offset + CHUNK_SIZE);
+      const chunk = await readSlice(slice);
+      
       // GOD MODE: send raw ArrayBuffer — no JSON wrapper
       conn.send(chunk);
       offset+=chunk.byteLength;totalSent+=chunk.byteLength;chunksSent++;localChunks++;
