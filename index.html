@@ -1287,7 +1287,23 @@ function handleFileSelect(files){
     if(!selectedFiles.some(f=>f.name===file.name&&f.size===file.size))selectedFiles.push(file);
   });
   updateFilePreviewList();
-  cancelTransfer();
+  
+  // Auto-send files since there's no send button in modern UI
+  if(typeof activeConnections !== 'undefined' && activeConnections.length > 0) {
+      activeConnections.forEach(conn => {
+          if(conn.open) {
+              if(typeof sendInChunks === 'function') sendInChunks(conn);
+          } else {
+              conn.on('open', () => {
+                  setTimeout(() => {
+                      if(conn.open && typeof sendInChunks === 'function') sendInChunks(conn);
+                  }, 500);
+              });
+          }
+      });
+  } else {
+      cancelTransfer();
+  }
 }
 
 function updateFilePreviewList(){
@@ -2201,7 +2217,9 @@ updateFilePreviewList = function() {
                 conn.on('open', () => {
                     if(selectedFiles.length > 0) {
                         console.log("Channel opened, sending queued files!");
-                        if(typeof sendInChunks === 'function') sendInChunks(conn);
+                        setTimeout(() => {
+                            if(typeof sendInChunks === 'function') sendInChunks(conn);
+                        }, 500);
                     }
                 });
             }
@@ -2283,15 +2301,19 @@ setTimeout(() => {
                 }
             } else {
                 conn.on('open', () => {
-                    try {
-                        conn.send(JSON.stringify({ type: 'code-share', content: codeContent }));
-                        sent = true;
-                        // Close modal after delayed send
-                        if(sent) {
-                            document.getElementById('code-share-modal').classList.remove('show');
-                            document.getElementById('code-share-modal-content').value = '';
+                    setTimeout(() => {
+                        if (conn.open) {
+                            try {
+                                conn.send(JSON.stringify({ type: 'code-share', content: codeContent }));
+                                sent = true;
+                                // Close modal after delayed send
+                                if(sent) {
+                                    document.getElementById('code-share-modal').classList.remove('show');
+                                    document.getElementById('code-share-modal-content').value = '';
+                                }
+                            } catch(e) {}
                         }
-                    } catch(e) {}
+                    }, 500);
                 });
             }
         });
