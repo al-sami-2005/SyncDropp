@@ -1536,6 +1536,12 @@ function sendInChunks(conn){
     document.getElementById('send-pct').textContent=pct+'%';
     document.getElementById('send-sent').textContent=fmtBytes(sent);
     
+    // Modern UI Hooks
+    const modernStats = document.getElementById('modern-transfer-stats');
+    if(modernStats) modernStats.textContent = `${fmtBytes(sent)} of ${fmtBytes(total)}`;
+    const modernProgress = document.getElementById('modern-progress-fill');
+    if(modernProgress) modernProgress.style.width = pct + '%';
+    
     if(elapsed>=0.5){
       const speed=elapsed>0?(sent-lastTotalSent)/elapsed:0,remaining=total-sent;
       document.getElementById('send-speed').textContent=fmtSpeed(speed);
@@ -1582,6 +1588,21 @@ function finishSendBatch(stopStream,totalSize){
   setRing('send-ring',100);
   document.getElementById('send-pct').textContent='100%';document.getElementById('send-lbl').textContent='DONE';
   document.getElementById('send-eta').textContent='0s';
+  setSendStatus('success',`Sent ${selectedFiles.length} files successfully.`);
+  
+  // Modern UI Recent List
+  const list = document.getElementById('modern-recent-list');
+  if(list && selectedFiles.length > 0) {
+      if(list.children[0] && list.children[0].innerText.includes('No recent')) list.innerHTML = '';
+      list.innerHTML = `<div class="recent-item">
+        <div class="recent-icon"><span class="material-icons-round">upload_file</span></div>
+        <div class="recent-info">
+          <div class="recent-name">Sent ${selectedFiles.length} File(s)</div>
+          <div class="recent-meta">Just now · ${fmtBytes(totalSize)}</div>
+        </div>
+        <div class="recent-status"><span class="material-icons-round">check_circle</span></div>
+      </div>` + list.innerHTML;
+  }
   document.getElementById('send-cancel-btn').classList.add('hidden');document.getElementById('send-stats').classList.add('hidden');
   document.getElementById('send-viz').querySelector('.hub-container').classList.add('hidden');
   document.getElementById('send-success').classList.add('visible');
@@ -1713,7 +1734,12 @@ function listenForFile(conn){
       totalBatchSize = totalBatchSize < totalBatchReceived ? totalBatchReceived : totalBatchSize;
       
       filesProcessed++;
-      updateUI(totalBatchReceived, totalBatchSize || totalBatchReceived);
+      
+      // Update Modern UI Stats
+      const modernStats = document.getElementById('modern-transfer-stats');
+      if(modernStats) modernStats.textContent = `${fmtBytes(totalBatchReceived)} of ${fmtBytes(totalBatchSize || totalBatchReceived)}`;
+      const modernProgress = document.getElementById('modern-progress-fill');
+      if(modernProgress) modernProgress.style.width = '100%';
     }
   });
 
@@ -1760,6 +1786,29 @@ function finishReceiveBatch(stopStream){
     });
   }
   document.getElementById('recv-success').classList.add('visible');
+  
+  // Modern UI Recent List
+  const list = document.getElementById('modern-recent-list');
+  if(list && receivedFiles.length > 0) {
+      if(list.children[0] && list.children[0].innerText.includes('No recent')) list.innerHTML = '';
+      
+      // Add each received file with a download button
+      receivedFiles.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'recent-item';
+        item.innerHTML = `
+          <div class="recent-icon"><span class="material-icons-round">download</span></div>
+          <div class="recent-info">
+            <div class="recent-name">${file.name}</div>
+            <div class="recent-meta">Received · ${fmtBytes(file.size)}</div>
+          </div>
+          <button class="md-btn md-btn-filled" style="height:32px; border-radius:16px; font-size:12px; padding:0 16px; min-width:80px; margin-left:12px; background:var(--primary);" onclick="downloadBatchFile(${index})">
+            Save
+          </button>
+        `;
+        list.insertBefore(item, list.firstChild);
+      });
+  }
 }
 
 function downloadFile(){if(!receivedFiles.length)return;const f=receivedFiles[0],a=document.createElement('a');a.href=f.url;a.download=f.name;document.body.appendChild(a);a.click();document.body.removeChild(a);}
