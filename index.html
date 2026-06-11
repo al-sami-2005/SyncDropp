@@ -1212,24 +1212,7 @@ async function getPeerConfig() {
       }
     ];
   } else {
-    // Fetch dynamic TURN credentials from metered.live
-    try {
-      const res = await fetch("https://syncdrpp.metered.live/api/v1/turn/credentials?apiKey=ef32a14d8969bede0d07a662d4272e90ac27");
-      if (res.ok) {
-        const data = await res.json();
-        // Metered returns an array directly, or an object with iceServers depending on the endpoint.
-        // The metered credentials endpoint usually returns an array of ICE servers.
-        if (Array.isArray(data)) {
-           options.config.iceServers = data;
-        } else if (data.iceServers) {
-           options.config.iceServers = data.iceServers;
-        }
-      }
-    } catch (err) {
-      console.warn("[TURN] Failed to fetch dynamic TURN servers:", err);
-    }
-
-    // Fallback if fetch fails or is empty
+    // Hardcoded robust STUN servers (TURN removed per request)
     if (!options.config.iceServers || options.config.iceServers.length === 0) {
       options.config.iceServers = [
         { urls: 'stun:stun.l.google.com:19302' },
@@ -1661,11 +1644,17 @@ function sendInChunks(conn){
       const chunk = await readSlice(slice);
       
       // GOD MODE: send raw ArrayBuffer — no JSON wrapper
-      conn.send(chunk);
+      try {
+          conn.send(chunk);
+      } catch (err) {
+          console.error("Critical Send Error:", err);
+          alert("Network Drop: Transfer failed while sending. Please reconnect.");
+          return false;
+      }
       offset+=chunk.byteLength;totalSent+=chunk.byteLength;chunksSent++;localChunks++;
       updateUI(totalSent,totalSize);
-      // Yield to event loop every 16 chunks (not every chunk!) 
-      if(localChunks%16===0)await new Promise(r=>setTimeout(r,0));
+      // Yield to event loop every 8 chunks to prevent mobile browser lockups
+      if(localChunks%8===0)await new Promise(r=>setTimeout(r,5));
     }
     ctrl({type:'file-end',index:fileIndex});
     return true;
@@ -1716,7 +1705,7 @@ async function connectToSender(){
     console.log('[SyncDrop] Receiver peer opened, connecting to:',code);
     // GOD MODE: serialization:'binary' ensures ArrayBuffer passthrough
     // without this, PeerJS base64-encodes ArrayBuffers on some browsers!
-    const conn=receiverPeer.connect(code,{reliable:true,serialization:'binary'});
+    const conn=receiverPeer.connect(code,{reliable:true});
     if(!conn){setRecvStatus('error','Failed to initiate connection.');return;}
     activeConnections.push(conn);
     monitorIceState(conn,'recv-ice-banner','recv-ice-text','diag-recv-ice',(t,m)=>setRecvStatus(t,m));
@@ -2164,7 +2153,7 @@ window.connectToSender = function() {
     }
 
     console.log('[SyncDrop] Unified connecting to:', code);
-    const conn = window.myPeer.connect(code, {reliable:true, serialization:'binary'});
+    const conn = window.myPeer.connect(code, {reliable:true});
     if(!conn) {
         alert('Failed to initiate connection.');
         document.getElementById('modern-connect-btn').textContent = 'Connect';
