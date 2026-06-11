@@ -1444,30 +1444,51 @@ function _attachIce(pc,bannerElId,textElId,diagIceId,statusFn){
 function cancelTransfer(){
   transferActive=false;
   if(diagInterval){clearInterval(diagInterval);diagInterval=null;}
-  if(myPeer){try{myPeer.destroy();}catch(e){}myPeer=null;}
-  if(receiverPeer){try{receiverPeer.destroy();}catch(e){}receiverPeer=null;}
-  activeConnections.forEach(c=>{try{c.close();}catch(e){}});activeConnections=[];
+  
+  // Send cancel signal to peers
+  if(typeof activeConnections !== 'undefined') {
+      activeConnections.forEach(conn => {
+          if(conn.open) {
+              try { conn.send(JSON.stringify({ type: 'cancel-transfer' })); } catch(e) {}
+          }
+      });
+  }
+
   const btn=document.getElementById('send-start-btn');
-  btn.disabled=false;btn.className='md-btn md-btn-filled md-btn-full';
-  btn.innerHTML='<span class="material-icons-round">rocket_launch</span> GENERATE SYNC LINK';
-  document.getElementById('share-active-area').classList.add('hidden');
-  document.getElementById('send-viz').classList.add('hidden');
-  document.getElementById('send-status-row').className='md-status info';
-  document.getElementById('send-status-text').textContent='Waiting for receiver to connect…';
-  document.getElementById('send-ice-banner').classList.add('hidden');
-  document.getElementById('send-diag').classList.add('hidden');
+  if(btn){
+    btn.disabled=false;btn.className='md-btn md-btn-filled md-btn-full';
+    btn.innerHTML='<span class="material-icons-round">rocket_launch</span> GENERATE SYNC LINK';
+  }
+  
+  const shareEl = document.getElementById('share-active-area'); if(shareEl) shareEl.classList.add('hidden');
+  const vizEl = document.getElementById('send-viz'); if(vizEl) vizEl.classList.add('hidden');
+  const statRow = document.getElementById('send-status-row'); if(statRow) statRow.className='md-status info';
+  const statText = document.getElementById('send-status-text'); if(statText) statText.textContent='Waiting for receiver to connect…';
+  const iceBanner = document.getElementById('send-ice-banner'); if(iceBanner) iceBanner.classList.add('hidden');
+  const diagEl = document.getElementById('send-diag'); if(diagEl) diagEl.classList.add('hidden');
   qrGenerated=false;
-  document.getElementById('recv-file-card').classList.add('hidden');
-  document.getElementById('receive-status').classList.add('hidden');
-  document.getElementById('recv-ice-banner').classList.add('hidden');
-  document.getElementById('recv-diag').classList.add('hidden');
-  document.getElementById('recv-success').classList.remove('visible');
-  document.getElementById('recv-files-list').innerHTML='';
-  document.getElementById('recv-files-list').classList.add('hidden');
-  document.getElementById('recv-single-save-btn').classList.add('hidden');
+  
+  const fileCard = document.getElementById('recv-file-card'); if(fileCard) fileCard.classList.add('hidden');
+  const rcvStatus = document.getElementById('receive-status'); if(rcvStatus) rcvStatus.classList.add('hidden');
+  const rcvIce = document.getElementById('recv-ice-banner'); if(rcvIce) rcvIce.classList.add('hidden');
+  const rcvDiag = document.getElementById('recv-diag'); if(rcvDiag) rcvDiag.classList.add('hidden');
+  const rcvSucc = document.getElementById('recv-success'); if(rcvSucc) rcvSucc.classList.remove('visible');
+  const rcvList = document.getElementById('recv-files-list'); if(rcvList) { rcvList.innerHTML=''; rcvList.classList.add('hidden'); }
+  const saveBtn = document.getElementById('recv-single-save-btn'); if(saveBtn) saveBtn.classList.add('hidden');
+  
   setRing('send-ring',0);setRing('recv-ring',0);
-  document.getElementById('send-pct').textContent='0%';document.getElementById('recv-pct').textContent='0%';
-  document.getElementById('send-lbl').textContent='UPLOADING';document.getElementById('recv-lbl').textContent='DOWNLOADING';
+  const sPct = document.getElementById('send-pct'); if(sPct) sPct.textContent='0%';
+  const rPct = document.getElementById('recv-pct'); if(rPct) rPct.textContent='0%';
+  const sLbl = document.getElementById('send-lbl'); if(sLbl) sLbl.textContent='UPLOADING';
+  const rLbl = document.getElementById('recv-lbl'); if(rLbl) rLbl.textContent='DOWNLOADING';
+
+  // Modern UI specific reset
+  const overlay = document.getElementById('modern-transfer-overlay');
+  if(overlay) overlay.style.display = 'none';
+  const progFill = document.getElementById('modern-progress-fill');
+  if(progFill) progFill.style.width = '0%';
+  const statsText = document.getElementById('modern-transfer-stats');
+  if(statsText) statsText.textContent = '0 MB of 0 MB';
 }
 
 // ── PARTICLE STREAM ───────────────────────────────────────────────────
@@ -1823,6 +1844,19 @@ function listenForFile(conn){
     if(typeof msg==='string'){
       let obj;try{obj=JSON.parse(msg);}catch(e){return;}
       if(obj.type==='code-share'){ window.dispatchEvent(new CustomEvent('code-share-received', {detail: obj.content})); }
+      else if(obj.type==='cancel-transfer'){
+        // Abort transfer but keep connection
+        currentFileChunks = [];
+        receivedFiles = [];
+        totalBatchReceived = 0;
+        const overlay = document.getElementById('modern-transfer-overlay');
+        if(overlay) overlay.style.display = 'none';
+        const progFill = document.getElementById('modern-progress-fill');
+        if(progFill) progFill.style.width = '0%';
+        const statsText = document.getElementById('modern-transfer-stats');
+        if(statsText) statsText.textContent = '0 MB of 0 MB';
+        alert("Transfer was cancelled by the sender.");
+      }
       else if(obj.type==='batch-meta'){ 
         receivedBatchMeta=obj;totalBatchSize=obj.totalSize||1;
       } else if(obj.type==='file-start'){
