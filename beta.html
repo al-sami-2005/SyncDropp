@@ -717,53 +717,80 @@ const BUFFER_LOW  = 512 * 1024;   // Resume threshold: 512KB
 const BUFFER_HIGH = 4 * 1024 * 1024; // Pause threshold: 4MB
 
 // ── GOD MODE ICE CONFIG GENERATOR ───────────────────────────────────
-function getPeerConfig() {
-  const customKey = localStorage.getItem('syncdrop_turn_key');
+async function getPeerConfig() {
+  let customKey = '';
+  let sigUrl = 'syncdrop-server.onrender.com'; // Default to backend server
+  try {
+    customKey = localStorage.getItem('syncdrop_turn_key');
+    const savedSigUrl = localStorage.getItem('syncdrop_sig_url');
+    if (savedSigUrl && savedSigUrl.trim().length > 0) sigUrl = savedSigUrl;
+  } catch(e) {
+    console.warn("localStorage is disabled in this environment.");
+  }
   
+  let options = {
+    debug: 2,
+    config: {
+      iceServers: []
+    }
+  };
+
+  let host = '';
+  if (sigUrl && sigUrl.trim().length > 0) {
+    host = sigUrl.trim().replace(/^https?:\/\//, '').replace(/\/$/, '');
+    options.host = host;
+    options.port = 443;
+    options.secure = true;
+    options.path = '/peerjs';
+  } else {
+    // If running on a server that hosts both frontend and backend
+    options.host = window.location.hostname;
+    options.port = window.location.port || (window.location.protocol === 'https:' ? 443 : 80);
+    options.path = '/peerjs';
+  }
+
   // If user provided a custom API key, use Metered's TURN + Custom STUN
   if (customKey && customKey.trim().length > 5) {
     const key = customKey.trim();
-    return {
-      debug: 2,
-      config: {
-        iceServers: [
-          { urls: 'stun:stun.l.google.com:19302' },
-          { urls: 'stun:stun.cloudflare.com:3478' },
-          {
-            urls: [
-              `turn:${key}.relay.metered.ca:80`,
-              `turn:${key}.relay.metered.ca:443`,
-              `turn:${key}.relay.metered.ca:443?transport=tcp`
-            ],
-            username: key,
-            credential: key
-          }
-        ]
+    options.config.iceServers = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun.cloudflare.com:3478' },
+      {
+        urls: [
+          `turn:${key}.relay.metered.ca:80`,
+          `turn:${key}.relay.metered.ca:443`,
+          `turn:${key}.relay.metered.ca:443?transport=tcp`
+        ],
+        username: key,
+        credential: key
       }
-    };
-  }
+    ];
+  } else {
+    // Fetch dynamic TURN credentials from backend
+    try {
+      const apiHost = sigUrl ? `https://${host}` : window.location.origin;
+      const res = await fetch(`${apiHost}/api/turn`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.iceServers) {
+           options.config.iceServers = data.iceServers;
+        }
+      }
+    } catch (err) {
+      console.warn("[TURN] Failed to fetch dynamic TURN servers:", err);
+    }
 
-  // DEFAULT BEHAVIOR (Matches beta.html)
-  // Include standard STUN servers and a free public TURN server to fix connections across symmetric NATs (mobile data)
-  return {
-    debug: 2,
-    config: {
-      iceServers: [
+    // Fallback if fetch fails or is empty
+    if (!options.config.iceServers || options.config.iceServers.length === 0) {
+      options.config.iceServers = [
         { urls: 'stun:stun.l.google.com:19302' },
         { urls: 'stun:stun.cloudflare.com:3478' },
-        { urls: 'stun:stun.services.mozilla.com' },
-        {
-          urls: [
-            'turn:openrelay.metered.ca:80',
-            'turn:openrelay.metered.ca:443',
-            'turn:openrelay.metered.ca:443?transport=tcp'
-          ],
-          username: 'openrelayproject',
-          credential: 'openrelayproject'
-        }
-      ]
+        { urls: 'stun:stun.services.mozilla.com' }
+      ];
     }
-  };
+  }
+
+  return options;
 }
 
 // ── BINARY WIRE PROTOCOL ────────────────────────────────────────────
@@ -875,9 +902,10 @@ function copyShareLink(btnId,isCodeTab=false){
 // ── GOD MODE: PEER FACTORY ────────────────────────────────────────────
 // Uses PeerJS cloud with explicit config, 30s timeout, auto-retry on id collision
 function initPeer(customId){
-  return new Promise((resolve,reject)=>{
+  return new Promise(async (resolve,reject)=>{
     const id=customId||genCode();
-    const peer=new Peer(id,getPeerConfig());
+    const config = await getPeerConfig();
+    const peer=new Peer(id,config);
     let resolved=false;
 
     const timeout=setTimeout(()=>{
@@ -1226,13 +1254,14 @@ function finishSendBatch(stopStream,totalSize){
 }
 
 // ── GOD MODE: RECEIVE FILE FLOW ───────────────────────────────────────
-function connectToSender(){
+async function connectToSender(){
   const code=document.getElementById('receive-code').value.trim().toUpperCase();
   if(!code||code.length<6){setRecvStatus('warn','Enter a valid 6-digit code.');return;}
   setRecvStatus('info','Connecting to sender…');
   if(receiverPeer){try{receiverPeer.destroy();}catch(e){}}
   
-  receiverPeer=new Peer(getPeerConfig());
+  const config = await getPeerConfig();
+  receiverPeer=new Peer(config);
 
   receiverPeer.on('open',myId=>{
     console.log('[SyncDrop] Receiver peer opened, connecting to:',code);
@@ -1524,12 +1553,13 @@ async function startCodeShare(){
   });
 }
 
-function connectForCode(){
+async function connectForCode(){
   const code=document.getElementById('code-recv-input').value.trim().toUpperCase();
   if(!code||code.length<6){setCodeRecvStatus('warn','Enter a valid 6-digit code.');return;}
   setCodeRecvStatus('info','Connecting…');
   if(codeRecvPeer){try{codeRecvPeer.destroy();}catch(e){}}
-  codeRecvPeer=new Peer(getPeerConfig());
+  const config = await getPeerConfig();
+  codeRecvPeer=new Peer(config);
   codeRecvPeer.on('open',()=>{
     const conn=codeRecvPeer.connect(code,{reliable:true,serialization:'json'});
     conn.on('open',()=>setCodeRecvStatus('info','Connected! Fetching code…'));
