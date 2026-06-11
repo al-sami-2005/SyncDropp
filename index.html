@@ -787,6 +787,18 @@ body {
 <script>
 // Additional modern hooks for new features
 document.addEventListener("DOMContentLoaded", () => {
+    // Auto-connect if URL has ?code=XXXXXX (from native phone camera QR scan)
+    const urlParams = new URLSearchParams(window.location.search);
+    const urlCode = urlParams.get('code');
+    if (urlCode && urlCode.length === 6) {
+        setTimeout(() => {
+            document.getElementById('modern-connect-input').value = urlCode.toUpperCase();
+            document.getElementById('modern-connect-btn').click();
+            // Clear URL so it doesn't try to reconnect on refresh
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }, 500); // Small delay to let peer init
+    }
+
     // Generate QR Code once the code is available
     const checkCode = setInterval(() => {
         const code = document.getElementById('modern-my-code').innerText;
