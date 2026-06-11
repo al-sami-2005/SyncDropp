@@ -1212,13 +1212,16 @@ async function getPeerConfig() {
       }
     ];
   } else {
-    // Fetch dynamic TURN credentials from backend
+    // Fetch dynamic TURN credentials from metered.live
     try {
-      const apiHost = sigUrl ? `https://${host}` : window.location.origin;
-      const res = await fetch(`${apiHost}/api/turn`);
+      const res = await fetch("https://syncdrpp.metered.live/api/v1/turn/credentials?apiKey=ef32a14d8969bede0d07a662d4272e90ac27");
       if (res.ok) {
         const data = await res.json();
-        if (data.iceServers) {
+        // Metered returns an array directly, or an object with iceServers depending on the endpoint.
+        // The metered credentials endpoint usually returns an array of ICE servers.
+        if (Array.isArray(data)) {
+           options.config.iceServers = data;
+        } else if (data.iceServers) {
            options.config.iceServers = data.iceServers;
         }
       }
@@ -2222,9 +2225,24 @@ updateFilePreviewList = function() {
     origUpdatePreview();
     if(selectedFiles.length > 0 && typeof activeConnections !== 'undefined' && activeConnections.length > 0) {
         activeConnections.forEach(conn => {
-            if(conn.open) {
+            const isReady = conn.open && conn.dataChannel && conn.dataChannel.readyState === 'open';
+            if(isReady) {
                 console.log("Auto-sending files!");
                 if(typeof sendInChunks === 'function') sendInChunks(conn);
+            } else {
+                console.warn("DataChannel not fully open yet. Queuing send.");
+                // Ensure we send when it finally opens
+                const sendOnOpen = () => {
+                    if(selectedFiles.length > 0) {
+                        console.log("Channel opened, sending queued files!");
+                        if(typeof sendInChunks === 'function') sendInChunks(conn);
+                    }
+                };
+                if(conn.dataChannel) {
+                    conn.dataChannel.addEventListener('open', sendOnOpen, {once: true});
+                } else {
+                    conn.on('open', sendOnOpen);
+                }
             }
         });
     } else if (selectedFiles.length > 0) {
