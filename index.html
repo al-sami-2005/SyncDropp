@@ -2225,24 +2225,17 @@ updateFilePreviewList = function() {
     origUpdatePreview();
     if(selectedFiles.length > 0 && typeof activeConnections !== 'undefined' && activeConnections.length > 0) {
         activeConnections.forEach(conn => {
-            const isReady = conn.open && conn.dataChannel && conn.dataChannel.readyState === 'open';
-            if(isReady) {
+            if(conn.open) {
                 console.log("Auto-sending files!");
                 if(typeof sendInChunks === 'function') sendInChunks(conn);
             } else {
-                console.warn("DataChannel not fully open yet. Queuing send.");
-                // Ensure we send when it finally opens
-                const sendOnOpen = () => {
+                console.warn("Connection not fully open yet. Queuing send.");
+                conn.on('open', () => {
                     if(selectedFiles.length > 0) {
                         console.log("Channel opened, sending queued files!");
                         if(typeof sendInChunks === 'function') sendInChunks(conn);
                     }
-                };
-                if(conn.dataChannel) {
-                    conn.dataChannel.addEventListener('open', sendOnOpen, {once: true});
-                } else {
-                    conn.on('open', sendOnOpen);
-                }
+                });
             }
         });
     } else if (selectedFiles.length > 0) {
@@ -2314,8 +2307,24 @@ setTimeout(() => {
     if(typeof activeConnections !== 'undefined') {
         activeConnections.forEach(conn => {
             if(conn.open) {
-                conn.send(JSON.stringify({ type: 'code-share', content: codeContent }));
-                sent = true;
+                try {
+                    conn.send(JSON.stringify({ type: 'code-share', content: codeContent }));
+                    sent = true;
+                } catch(e) {
+                    console.error("Code share error:", e);
+                }
+            } else {
+                conn.on('open', () => {
+                    try {
+                        conn.send(JSON.stringify({ type: 'code-share', content: codeContent }));
+                        sent = true;
+                        // Close modal after delayed send
+                        if(sent) {
+                            document.getElementById('code-share-modal').classList.remove('show');
+                            document.getElementById('code-share-modal-content').value = '';
+                        }
+                    } catch(e) {}
+                });
             }
         });
     }
