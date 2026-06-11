@@ -2078,8 +2078,122 @@ window.addEventListener('load',()=>{
 </script>
 <script>
 
+
+
+
 // --- MODERN UI BINDINGS ---
+// Sync transfer stats to the modern UI
+setInterval(() => {
+    // Attempt to sync the progress bars
+    try {
+        const sendPct = document.getElementById('send-pct').textContent;
+        const recvPct = document.getElementById('recv-pct').textContent;
+        const sendVal = parseInt(sendPct) || 0;
+        const recvVal = parseInt(recvPct) || 0;
+        
+        document.getElementById('modern-stats-sent').style.width = sendVal + '%';
+        document.getElementById('modern-stats-recv').style.width = recvVal + '%';
+        
+        // Try to guess the MB if available
+        let sentText = document.getElementById('send-lbl').textContent;
+        let recvText = document.getElementById('recv-lbl').textContent;
+        if(sendVal > 0) document.querySelector('.modern-stats-bar').parentElement.querySelector('.modern-stats-header').innerHTML = `<div class="modern-stats-title">Sending...</div><div class="modern-stats-values">${sendVal}%</div>`;
+        if(recvVal > 0) document.querySelector('.modern-stats-bar').parentElement.querySelector('.modern-stats-header').innerHTML = `<div class="modern-stats-title">Receiving...</div><div class="modern-stats-values">${recvVal}%</div>`;
+    } catch(e) {}
+}, 500);
+
+
+
+// Override finishReceiveBatch to show received files in the new UI!
+const origFinishReceiveBatch = typeof finishReceiveBatch === 'function' ? finishReceiveBatch : () => {};
+window.finishReceiveBatch = function(stopStream) {
+    origFinishReceiveBatch(stopStream);
+    
+    // Now add them to the Modern UI Recent List!
+    const list = document.getElementById('modern-recent-list');
+    if(list && list.children[0] && list.children[0].innerText.includes('No recent')) list.innerHTML = '';
+    
+    // We can just add the most recent batch of files
+    if(typeof receivedFiles !== 'undefined' && receivedFiles.length > 0) {
+        receivedFiles.forEach((file, index) => {
+            // Check if it's already in the list by name, or just add it
+            const id = 'recv-' + Date.now() + '-' + index;
+            const htmlStr = `<div class="recent-item">
+              <div class="recent-icon"><span class="material-icons-round">insert_drive_file</span></div>
+              <div class="recent-info">
+                <div class="recent-name">${file.name}</div>
+                <div class="recent-meta">${(file.size / 1024 / 1024).toFixed(2)} MB</div>
+              </div>
+              <button class="btn-glass" style="padding: 4px 12px; font-size: 11px;" onclick="downloadBatchFile(${index})">Save</button>
+            </div>`;
+            if(list) list.innerHTML = htmlStr + list.innerHTML;
+        });
+    }
+};
+
+
+// Override setRecvStatus to show alerts for errors so we aren't blind
+const origSetRecvStatus = typeof setRecvStatus === 'function' ? setRecvStatus : () => {};
+window.setRecvStatus = function(type, text) {
+    origSetRecvStatus(type, text);
+    if(type === 'error') {
+        alert("Connection Error: " + text);
+        document.getElementById('modern-connect-btn').textContent = 'Connect';
+    } else if (type === 'warn') {
+        console.warn("Connection warning:", text);
+    }
+};
+
+// Completely rewrite connectToSender for the unified architecture
+window.connectToSender = function() {
+    const code = document.getElementById('modern-connect-input').value.trim().toUpperCase();
+    if(!code || code.length < 6) {
+        alert('Enter a valid 6-digit code.');
+        return;
+    }
+    
+    document.getElementById('modern-connect-btn').innerHTML = '<div class="logo-spinner"></div>';
+    
+    if(!window.myPeer) {
+        alert("Peer not initialized yet. Wait a moment.");
+        document.getElementById('modern-connect-btn').textContent = 'Connect';
+        return;
+    }
+
+    console.log('[SyncDrop] Unified connecting to:', code);
+    const conn = window.myPeer.connect(code, {reliable:true, serialization:'binary'});
+    if(!conn) {
+        alert('Failed to initiate connection.');
+        document.getElementById('modern-connect-btn').textContent = 'Connect';
+        return;
+    }
+    
+    activeConnections.push(conn);
+    
+    // We should also listen for files coming BACK to us on this connection!
+    conn.on('open', () => {
+        console.log('[SyncDrop] Unified DataChannel open!');
+        document.getElementById('modern-connect-btn').textContent = 'Connected!';
+        if(typeof listenForFile === 'function') listenForFile(conn);
+    });
+    
+    conn.on('error', err => {
+        alert("Connection error: " + (err.message || err.type));
+        document.getElementById('modern-connect-btn').textContent = 'Connect';
+    });
+    
+    const openTimeout = setTimeout(() => {
+        if(!conn.open) {
+            alert('Connection timed out. Check the code and try again.');
+            document.getElementById('modern-connect-btn').textContent = 'Connect';
+            // Remove from active connections
+            activeConnections = activeConnections.filter(c => c !== conn);
+        }
+    }, 15000);
+};
+
 async function autoInitHost() {
+
     if (typeof initPeer !== 'function') return;
     try {
         const peer = await initPeer();
