@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.5.2/peerjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <style>
 :root {
   --primary: #007AFF; /* Premium iOS-like Blue */
@@ -365,6 +366,7 @@ body::before {
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+#legacy-ui { display: none !important; }
 body {
   background: var(--bg-app);
   color: var(--text-main);
@@ -637,6 +639,12 @@ body {
           <input type="text" id="modern-connect-input" class="connect-input" placeholder="ENTER CODE" maxlength="6">
           <button class="btn-primary" id="modern-connect-btn">Connect</button>
         </div>
+        <div style="text-align:center; margin-top:16px;">
+          <button class="btn-primary" id="modern-scan-qr-btn" style="background: rgba(255,255,255,0.1); width: 100%; border: 1px dashed rgba(255,255,255,0.3); color: white; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <span class="material-icons-round">qr_code_scanner</span>Scan QR
+          </button>
+        </div>
+        <div id="qr-reader" style="width:100%; display:none; margin-top:16px; border-radius:16px; overflow:hidden; background: black;"></div>
       </div>
 
       <!-- Connected State -->
@@ -794,6 +802,46 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
     }
+
+    // QR Scanner
+    document.getElementById('modern-scan-qr-btn').addEventListener('click', () => {
+        const qrReader = document.getElementById('qr-reader');
+        if (qrReader.style.display === 'block') {
+            qrReader.style.display = 'none';
+            if (window.html5QrCode) {
+                window.html5QrCode.stop().catch(()=>{});
+            }
+            return;
+        }
+        qrReader.style.display = 'block';
+        window.html5QrCode = new Html5Qrcode("qr-reader");
+        window.html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+            (decodedText) => {
+                window.html5QrCode.stop().catch(()=>{});
+                qrReader.style.display = 'none';
+                try {
+                    const url = new URL(decodedText);
+                    const code = url.searchParams.get('code');
+                    if (code) {
+                        document.getElementById('modern-connect-input').value = code;
+                        document.getElementById('modern-connect-btn').click();
+                    } else if (decodedText.length === 6) {
+                        document.getElementById('modern-connect-input').value = decodedText;
+                        document.getElementById('modern-connect-btn').click();
+                    }
+                } catch(e) {
+                    if (decodedText.length === 6) {
+                        document.getElementById('modern-connect-input').value = decodedText;
+                        document.getElementById('modern-connect-btn').click();
+                    }
+                }
+            },
+            (err) => {}
+        ).catch(err => {
+            alert("Camera access denied or unavailable.");
+            qrReader.style.display = 'none';
+        });
+    });
 });
 </script>
 
