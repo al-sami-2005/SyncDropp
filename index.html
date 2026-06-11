@@ -373,10 +373,15 @@ body {
   font-family: var(--font-sans);
   min-height: 100vh;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
   position: relative;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+@media (min-width: 768px) {
+  body {
+    padding: 40px 20px;
+  }
 }
 
 /* Animated Mesh Background */
@@ -398,18 +403,19 @@ body {
 .app-container {
   width: 100%;
   max-width: 520px;
-  height: 100vh;
+  min-height: 100vh;
+  height: auto;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   background: var(--card-bg);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  overflow-y: auto;
   position: relative;
 }
 @media (min-width: 768px) {
   .app-container {
-    height: 90vh;
+    min-height: auto;
     border: 1px solid var(--card-border);
     border-radius: 32px;
     box-shadow: var(--glass-shadow);
@@ -486,6 +492,7 @@ body {
 /* Inputs */
 .connect-inputs { display: flex; gap: 12px; }
 .connect-input {
+  min-width: 0;
   flex: 1; background: rgba(0,0,0,0.4); border: 1px solid var(--card-border);
   border-radius: 16px; padding: 16px; color: white; font-size: 18px;
   text-align: center; letter-spacing: 2px; outline: none; transition: 0.3s;
@@ -494,8 +501,9 @@ body {
 .connect-input::placeholder { color: rgba(255,255,255,0.2); font-size: 16px; letter-spacing: 1px; }
 
 .btn-primary {
+  flex-shrink: 0; display: flex; align-items: center; justify-content: center; height: auto;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
-  color: white; border: none; padding: 0 24px; border-radius: 16px;
+  color: white; border: none; padding: 16px 24px; border-radius: 16px;
   font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.3s;
   box-shadow: 0 8px 20px var(--primary-glow);
 }
